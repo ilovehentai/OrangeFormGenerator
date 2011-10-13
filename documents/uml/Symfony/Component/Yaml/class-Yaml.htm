@@ -1,0 +1,26 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1"/>
+	<title>class Yaml</title>
+	<link type="text/css" rel="stylesheet" href="../../../$resources/style.css"/>
+	<script type="text/javascript" language="javascript" src="../../../$resources/treeview.js"></script>
+</head>
+<body onload="toggler.setupTreeView('MainList');toggler.backToMemorizedState('MainList', 'btnToggle')">
+	<ul class="navig">
+	<li><a href="javascript:toggler.toggleAll('MainList', 'btnToggle')" class="expandAllBtn" id="btnToggle">Expand all</a></li><li><a href="../../../help.htm" class="helpBtn">Help</a></li><li><a href="../../../index-all.htm" class="indexAllBtn">Index</a></li><li><a href="class-Unescaper.htm" class="left">Prev class</a></li><li><a href="package-summary.htm" class="top">Package</a></li>
+	</ul>
+	<h1 class="class">Yaml</h1>
+	<div id="MainList">
+	<div class="description"><p>Class <span class="title">Symfony\Component\Yaml\Yaml</span></p><ul class="description"><li>Yaml offers convenience methods to load and dump YAML.</li><li class="smaller">@author Fabien Potencier &lt;fabien@symfony.com&gt;</li><li class="smaller">@api </li><li>File: Vendors/Symfony/Component/Yaml/Yaml.php</li></ul></div><h2>Functions</h2><ul class="summary"><li class="Collapsed" id="f4e91e8b5db9d2"><a href="javascript:void(0);" class="method-pub" target="main">parse</a>(<a href="../../../datatype-string.htm" class="link">string</a> $input)<ul class="description"><li>Public static <a href="../../../datatype-array.htm" class="link">array</a> <span class="smallTitle">parse</span>(<a href="../../../datatype-string.htm" class="link">string</a> $input)</li><li>Parses YAML into a PHP array.<br />
+<br />
+The parse method, when supplied with a YAML stream (string or file), will do its best to convert YAML in a file into a PHP array.<br />
+<br />
+Usage:<br />
+&lt;code&gt; $array = Yaml::parse('config.yml'); print_r($array); &lt;/code&gt;</li><li class="smaller">@param string $input Path to a YAML file or a string containing YAML</li><li class="smaller">@return array The YAML converted to a PHP array</li><li class="smaller">@throws \InvalidArgumentException If the YAML is not valid</li><li class="smaller">@api </li></ul></li><li class="Collapsed" id="f4e91e8b5dc62e"><a href="javascript:void(0);" class="method-pub" target="main">dump</a>(<a href="../../../datatype-array.htm" class="link">array</a> $array,<a href="../../../datatype-int.htm" class="link">int</a> $inline<span class="defVal"> = 2</span>)<ul class="description"><li>Public static <a href="../../../datatype-string.htm" class="link">string</a> <span class="smallTitle">dump</span>(<a href="../../../datatype-array.htm" class="link">array</a> $array,<a href="../../../datatype-int.htm" class="link">int</a> $inline<span class="defVal"> = 2</span>)</li><li>Dumps a PHP array to a YAML string.<br />
+<br />
+The dump method, when supplied with an array, will do its best to convert the array into friendly YAML.</li><li class="smaller">@param array $array PHP array</li><li class="smaller">@param integer $inline The level where you switch to inline YAML</li><li class="smaller">@return string A YAML string representing the original PHP array</li><li class="smaller">@api </li></ul></li></ul>
+	</div>
+	<div id="footer">Documentation generated on Oct 9, 2011, 18:32:22 +0000 by <a href="http://pear.php.net/package/PHP_UML/" target="_new">PHP_UML</a></div>
+</body>
+</html>

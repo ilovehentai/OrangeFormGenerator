@@ -1,0 +1,96 @@
+/* 
+    Document   : form.css
+    Created on : 25/Set/2011, 15:47:18
+    Author     : seara
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+body{
+    font: normal 12px Arial;
+    background-color: #FAFAFA;
+}
+form{
+    padding:20px;
+    margin: 20px 0;
+    display:block;
+}
+fieldset{
+    border: solid 1px #D0D0D0;
+    margin: 20px 0;
+    background-color: #FFFFFF;
+    padding: 20px;
+}
+
+fieldset br{
+    clear:both;
+}
+
+legend{
+    border: solid 1px #D0D0D0;
+    background-color: #F3EED0;
+    font-size:13px;
+    padding:5px 3px;
+}
+
+label{
+    width:130px;
+    display:block;
+    overflow:hidden;
+    float:left;
+    margin:10px 0;
+}
+
+.small-label{
+    width: 55px !important;
+}
+
+input{
+    float:left;
+}
+
+.list-of-buttons{
+    display:block;
+    list-style: none;
+    margin: 0px;
+    padding:0px;
+}
+
+.list-of-buttons li{
+    float:left;
+    margin-right:10px;
+}
+
+input[type=checkbox], input[type=radio]{
+    margin:10px 15px 10px 0;
+}
+
+input[type=text], input[type=password], textarea{
+    border: solid 1px #D0D0D0;
+    width:300px;
+}
+
+input[type=reset], input[type=button], 
+input[type=submit], button{
+    border: solid 1px #D0D0D0;
+    background-color: #FDFDFD;
+    padding: 3px 5px;
+}
+.sex-label{
+    width:15px;
+}
+.group-label{
+    width:55px;
+}
+
+textarea{
+    height:150px;
+    font:normal 12px Arial;
+}
+
+.break-float{
+    clear: both;
+    height: 0.1em;
+    padding: 0px;
+    margin: 0px;
+}

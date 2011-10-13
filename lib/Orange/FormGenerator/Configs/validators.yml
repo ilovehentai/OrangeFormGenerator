@@ -1,0 +1,26 @@
+## YAML Template.
+## validatores rules
+---
+js_template: /Configs/baseTemplates/basejs.html
+title_msg: Error in fields form
+error_msg: Some errors were founds
+
+rules:
+  not_empty:
+    class: NotEmptyValidation
+  money:
+    class: MoneyValidation
+  phone:
+    class: PhoneValidation
+  email:
+    class: EmailValidation
+  selected:
+    class: SelectedValidation
+  checked:
+    class: CheckedValidation
+    method: checked
+  regExpression:
+    class: RegExpressionValidation
+    method: match
+    params:
+      - string

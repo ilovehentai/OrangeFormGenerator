@@ -1,0 +1,36 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=iso-8859-1"/>
+	<title>class ApcUniversalClassLoader</title>
+	<link type="text/css" rel="stylesheet" href="../../../$resources/style.css"/>
+	<script type="text/javascript" language="javascript" src="../../../$resources/treeview.js"></script>
+</head>
+<body onload="toggler.setupTreeView('MainList');toggler.backToMemorizedState('MainList', 'btnToggle')">
+	<ul class="navig">
+	<li><a href="javascript:toggler.toggleAll('MainList', 'btnToggle')" class="expandAllBtn" id="btnToggle">Expand all</a></li><li><a href="../../../help.htm" class="helpBtn">Help</a></li><li><a href="../../../index-all.htm" class="indexAllBtn">Index</a></li><li><a href="package-summary.htm" class="top">Package</a></li><li><a href="class-ClassCollectionLoader.htm" class="right">Next class</a></li>
+	</ul>
+	<h1 class="class">ApcUniversalClassLoader</h1>
+	<div id="MainList">
+	<div class="description"><p>Class <span class="title">Symfony\Component\ClassLoader\ApcUniversalClassLoader</span> extends <a href="../../../Symfony/Component/ClassLoader/class-UniversalClassLoader.htm" class="link2">Symfony\Component\ClassLoader\UniversalClassLoader</a></p><ul class="description"><li>ApcUniversalClassLoader implements a &quot;universal&quot; autoloader cached in APC for PHP 5.3.<br />
+<br />
+It is able to load classes that use either:<br />
+<br />
+* The technical interoperability standards for PHP 5.3 namespaces and class names (http://groups.google.com/group/php-standards/web/psr-0-final-proposal); <br />
+* The PEAR naming convention for classes (http://pear.php.net/).<br />
+<br />
+Classes from a sub-namespace or a sub-hierarchy of PEAR classes can be looked for in a list of locations to ease the vendoring of a sub-set of classes for large projects.<br />
+<br />
+Example usage:<br />
+<br />
+require 'vendor/symfony/src/Symfony/Component/ClassLoader/UniversalClassLoader.php'; require 'vendor/symfony/src/Symfony/Component/ClassLoader/ApcUniversalClassLoader.php'; <br />
+use Symfony\Component\ClassLoader\ApcUniversalClassLoader; <br />
+$loader = new ApcUniversalClassLoader('apc.prefix.'); <br />
+// register classes with namespaces $loader-&gt;registerNamespaces(array( 'Symfony\Component' =&gt; __DIR__.'/component', 'Symfony'           =&gt; __DIR__.'/framework', 'Sensio'            =&gt; array(__DIR__.'/src', __DIR__.'/vendor'), )); <br />
+// register a library using the PEAR naming convention $loader-&gt;registerPrefixes(array( 'Swift_' =&gt; __DIR__.'/Swift', )); <br />
+// activate the autoloader $loader-&gt;register(); <br />
+In this example, if you try to use a class in the Symfony\Component namespace or one of its children (Symfony\Component\Console for instance), the autoloader will first look for the class under the component/ directory, and it will then fallback to the framework/ directory if not found before giving up.</li><li class="smaller">@author Fabien Potencier &lt;fabien@symfony.com&gt;</li><li class="smaller">@author Kris Wallsmith &lt;kris@symfony.com&gt;</li><li class="smaller">@api </li><li>File: Vendors/Symfony/Component/ClassLoader/ApcUniversalClassLoader.php</li></ul></div><dl class="inheritTree"><dd style="padding-left:-15px"><a href="../../../Symfony/Component/ClassLoader/class-UniversalClassLoader.htm" class="link2">Symfony\Component\ClassLoader\UniversalClassLoader</a></dd><dd style="padding-left:100px" class="current"><img src="../../../$resources/inherit.gif" alt="extended by "/>Symfony\Component\ClassLoader\ApcUniversalClassLoader</dd></dl><h2>Properties</h2><ul class="summary"><li class="Collapsed" id="prefix"><a href="javascript:void(0);" class="property-pri" target="main">$prefix</a><ul class="description"><li>Private <a href="../../../datatype-mixed.htm" class="link">mixed</a> <span class="smallTitle">$prefix</span></li></ul></li></ul><h2>Functions</h2><ul class="summary"><li class="Collapsed" id="f4e91e8b5a3131"><a href="javascript:void(0);" class="method-pub" target="main">__construct</a>(<a href="../../../datatype-string.htm" class="link">string</a> $prefix)<ul class="description"><li>Public <a href="../../../datatype-void.htm" class="link">void</a> <span class="smallTitle">__construct</span>(<a href="../../../datatype-string.htm" class="link">string</a> $prefix)</li><li>Constructor.</li><li class="smaller">@param string $prefix A prefix to create a namespace in APC</li><li class="smaller">@api </li></ul></li><li class="Collapsed" id="f4e91e8b5a3526"><a href="javascript:void(0);" class="method-pub" target="main">findFile</a>(<a href="../../../datatype-string.htm" class="link">string</a> $class)<ul class="description"><li>Public <a href="../../../datatype-void.htm" class="link">void</a> <span class="smallTitle">findFile</span>(<a href="../../../datatype-string.htm" class="link">string</a> $class)</li><li>Finds a file by class name while caching lookups to APC.</li><li class="smaller">@param string $class A class name to resolve to file</li><li>Finds the path to the file where the class is defined.<br/><span class="note">(copied from class <a href="../../../Symfony/Component/ClassLoader/class-UniversalClassLoader.htm" class="link">Symfony\Component\ClassLoader\UniversalClassLoader</a>)</span></li></ul></li></ul>
+	</div>
+	<div id="footer">Documentation generated on Oct 9, 2011, 18:32:22 +0000 by <a href="http://pear.php.net/package/PHP_UML/" target="_new">PHP_UML</a></div>
+</body>
+</html>

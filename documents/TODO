@@ -1,0 +1,5 @@
+- Modo AjaxSubmit no FormGenerator
+- ReadOnly o formulário tem os seus campos todos como apenas de leitura e nao tem inputs de submit ou image
+- Por o validation config file num ficheiro de configurações da biblioteca, config path tambem
+- implementar regras de igualdade de valores nas validações
+- Se alterarmos o template a cache nao o vai permitir porque ela so valida o config
