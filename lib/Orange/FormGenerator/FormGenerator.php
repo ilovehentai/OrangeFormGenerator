@@ -90,13 +90,19 @@ class FormGenerator implements FormGeneratorObserver{
     private $_mListValidators = array();
     
     /**
+     * Error reported in form
+     * @var string 
+     */
+    private $_mErrorsInForm = "";
+    
+    /**
      * List of defaults values for elements
      * @var array 
      */
     private static $_mElementsDefaultValues = array();
     
     /** Magic methods **/
-    
+
     /**
      * Create a FormGenerator Object, if the name of a configuration file is passed in the constructor,
      * it will check whether the file exists and set it as the configuration file
@@ -132,7 +138,7 @@ class FormGenerator implements FormGeneratorObserver{
         ValidationConfigClass::getInstance()->loadValidationConfigFile(OFG_CONFIG_DIR . OFG_VALIDATION_CONFIG_FILE);
         $this->_mId = $idform;
     }
-    
+        
     /**
      * On serialization save only important data, form error,
      * form elements, list validators and readonly flag
@@ -270,38 +276,48 @@ class FormGenerator implements FormGeneratorObserver{
     public function render($template = "")
     {
         
-        try{
-            
-            $cache_name = $this->_mId . "_" . md5_file($this->_mConfigFile) . ".php";
-            CacheClass::iniCache();
-            $stream = CacheClass::checkCacheFile($cache_name);
-            
-            if($stream === false || $this->_mDebug === true)
-            {
-                
-                $stream = $this->generateHtmlForm($template);
-
-                $this->_mformElement->setStream($stream);
-                $stream = $this->_mformElement->build();
-
-                $stream .= $this->buildJavaScript();
-
-                CacheClass::clearFileCache($this->_mId);
-                CacheClass::saveDataFile($cache_name, $stream);
-                
-            }
-            else
-            {
-                $stream = "";
-                include CacheClass::$_cache_path . DIRECTORY_SEPARATOR . $cache_name;
-            }
-            
-            return $stream;
-            
-        }  
-        catch (Exception $e)
+        if(is_file($this->_mConfigFile))
         {
-            echo $e->getTraceAsString();
+            try{
+                
+                $this->parseConfigFile();
+                $this->loadTemplate($template);
+                
+                CacheClass::iniCache();
+                $cache_name = CacheClass::expectedCacheName($this->_mId, $this->_mConfigFile, __DIR__ . $this->_mTemplate);
+                $stream = CacheClass::checkCacheFile($cache_name);
+
+                if($stream === false || $this->_mDebug === true)
+                {
+
+                    $stream = $this->generateHtmlForm();
+
+                    $this->_mformElement->setStream($stream);
+                    $stream = $this->_mformElement->build();
+
+                    $stream .= $this->buildJavaScript();
+
+                    CacheClass::clearFileCache($this->_mId);
+                    CacheClass::saveDataFile($cache_name, $stream);
+
+                }
+                else
+                {
+                    $stream = "";
+                    include CacheClass::$_cache_path . DIRECTORY_SEPARATOR . $cache_name;
+                }
+
+                return $stream;
+
+            }  
+            catch (Exception $e)
+            {
+                echo $e->getTraceAsString();
+            }
+        }
+        else
+        {
+            throw new \Exception("No configuration data");
         }
         
     }
@@ -325,12 +341,9 @@ class FormGenerator implements FormGeneratorObserver{
     /** Private Methods **/
     
     /**
-     * Load a return the html template buffer as a string
-     * If a template name is passed to the method, it will check if the
-     * file exists.
-     * If not throws an exception
+     * Set the template name
      * @param string $template
-     * @return string 
+     * @return void 
      */
     private function loadTemplate($template = "")
     {
@@ -342,7 +355,17 @@ class FormGenerator implements FormGeneratorObserver{
         {
             $this->_mTemplate = $this->_mFormData["template"];
         }
-        
+    }
+    
+    /**
+     * Load a return the html template buffer as a string
+     * If a template name is passed to the method, it will check if the
+     * file exists.
+     * If not throws an exception
+     * @return string 
+     */
+    private function getTemplateStream()
+    {
         if(is_file(__DIR__ . $this->_mTemplate))
         {
             ob_start();
@@ -360,11 +383,10 @@ class FormGenerator implements FormGeneratorObserver{
      * @param string $template
      * @return string 
      */
-    private function generateHtmlForm($template = "")
+    private function generateHtmlForm()
     {
-        if(is_file($this->_mConfigFile))
+        if(!empty($this->_mFormData))
         {
-            $this->parseConfigFile();
             $this->iniForm();
             
             CheckConfigFile::check($this->_mFormData);
@@ -376,7 +398,7 @@ class FormGenerator implements FormGeneratorObserver{
             {
                 $this->getFormElements();
                 $this->getFormFieldsets();
-                $stream = $this->loadTemplate($template);
+                $stream = $this->getTemplateStream();
 
                 return $this->placeFormElements($stream);
             }
@@ -601,15 +623,97 @@ class FormGenerator implements FormGeneratorObserver{
     public function set_mDebug($_mDebug) {
         $this->_mDebug = $_mDebug;
     }
+    
+    /**
+     * Get List of Elements
+     * @return BaseElement[]
+     */
+    public function get_mElements() {
+        return $this->_mElements;
+    }
+    
+    /**
+     * Get List of Validators
+     * @return type BaseValidation[]
+     */
+    public function get_mListValidators() {
+        return $this->_mListValidators;
+    }
+    
+    /**
+     * Set error message
+     * @param string $_mErrorsInForm 
+     */
+    public function set_mErrorsInForm($_mErrorsInForm) {
+        $this->_mErrorsInForm = $_mErrorsInForm;
+    }
         
     /** Static methods **/
     
     /**
      * Check if the form data is valid
      */
-    public static function isValid()
+    public static function isValid($formId)
     {
+        $valid = true;
+        self::clearErrors($formId);
         
+        if(!empty($formId))
+        {
+            $formObj = self::getFormData($formId);
+            if($formObj instanceof \FormGenerator)
+            {
+                if(count($formObj->get_mListValidators()) > 0 && count($formObj->get_mElements()) > 0)
+                {
+                    if($_SERVER["REQUEST_METHOD"] == "POST")
+                    {
+                        $submited_data = $_POST;
+                    }
+                    else
+                    {
+                        $submited_data = $_GET;
+                    }
+
+                    
+                    foreach($formObj->get_mElements() as $element)
+                    {
+                        /* @var $element BaseElement */
+                        if($element instanceof FormElements\FileElement)
+                        {
+                            $submited_data[$name] = $_FILES[$name]["name"];
+                        }
+
+                        if(!$element->isValid($submited_data[$element->get_mName()])) {
+                            $formObj->setErrors($element->get_mErrors());
+                        }	
+                    }
+                }
+            }
+        }
+        
+        return $valid;
+    }
+    
+    /**
+     * Set the form error message
+     * @param string $errors
+     */
+    private function setErrors(array $errors)
+    {
+        $this->_mErrorsInForm .= implode("<br/>", $errors);
+    }
+    
+    /**
+     * Retrieve FormGenerator object from session
+     * @param string $formId
+     * @return FormGenerator 
+     */
+    private static function getFormData($formId)
+    {
+        if(!empty($_SESSION["ofg"][$formId]["object"]))
+        {
+            return unserialize($_SESSION["ofg"][$formId]["object"]);
+        }
     }
     
     /**
@@ -638,6 +742,13 @@ class FormGenerator implements FormGeneratorObserver{
             return self::$_mElementsDefaultValues[$index];
         }
         return false;
+    }
+    
+    public static function clearErrors($formId)
+    {
+        $form = self::getFormData($formId);
+        $form->set_mErrorsInForm("");
+        $form->save();
     }
     
 }

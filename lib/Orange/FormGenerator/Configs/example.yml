@@ -29,7 +29,6 @@ fields:
       - rule: not_empty
         message: The name field is mandatory
     attributes: 
-      name: name
       value: $nome_pessoal
       maxlength: 100
 

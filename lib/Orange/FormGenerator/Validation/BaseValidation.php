@@ -11,6 +11,7 @@ class BaseValidation implements ValidationInterface{
     protected $_mExpression;
     protected $_mErrorMessage;
 
+    
     public function __construct()
     {
         
@@ -38,5 +39,9 @@ class BaseValidation implements ValidationInterface{
 
     public function set_mFormID($_mFormID) {
         $this->_mFormID = $_mFormID;
+    }
+    
+    public function get_mErrorMessage() {
+        return $this->_mErrorMessage;
     }
 }

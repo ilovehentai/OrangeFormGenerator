@@ -15,7 +15,16 @@ abstract class BaseElement implements InterfaceElement, ElementObservable{
     protected $_mElementData;
     protected $_mValidations;
     protected $_mObservers = array();
-
+    protected $_mName;
+    protected $_mErrors = array();
+    protected $_mCheckName = true;
+    
+    /**
+     * Create a BaseElemet Object, recieve a configuration array containing 
+     * an id, somes attributes
+     * @param array $config 
+     * @return BaseElement
+     */
     public function __construct(array $config = array())
     {
         if(array_key_exists("attributes", $config) && is_array($config['attributes']))
@@ -29,12 +38,13 @@ abstract class BaseElement implements InterfaceElement, ElementObservable{
         
         $this->_mElementData = $config;
         
-        if(is_array($this->_mElementData) && array_key_exists("name", $this->_mElementData))
-        {
-            $this->_mAttributes['name'] = $this->_mElementData['name'];
-        }
     }
     
+    /**
+     * Add validations to the validation list from the configuration data passed to the constructor
+     * A base Element can recieve multiple validations objects
+     * @return void
+     */
     public function setValidations()
     {
         if(array_key_exists("validation", $this->_mElementData) && is_array($this->_mElementData['validation']))
@@ -43,6 +53,11 @@ abstract class BaseElement implements InterfaceElement, ElementObservable{
         }
     }
     
+    /**
+     * Create and add a validation object to validation list
+     * @param array $validation_info 
+     * @return
+     */
     public function addValidations(array $validation_info)
     {
         if(!empty($validation_info))
@@ -53,20 +68,45 @@ abstract class BaseElement implements InterfaceElement, ElementObservable{
                 if(is_array($class_info) && array_key_exists("class", $class_info))
                 {
                     $vinfo = array_merge($vinfo, $class_info);
-                    $_mValidations[] = ValidationFactory::creatElement($vinfo);
+                    $this->_mValidations[] = ValidationFactory::creatElement($vinfo);
                     $this->notify($vinfo);
                 }
             }
         }
     }
     
-    public function buildAttributes(array $attributes)
+    public function checkAttributeName()
+    {
+        
+        if(!array_key_exists("name", $this->_mAttributes) && 
+                is_array($this->_mElementData) && array_key_exists("name", $this->_mElementData))
+        {
+            $this->_mAttributes['name'] = $this->_mElementData['name'];
+        }
+        else if(!array_key_exists("name", $this->_mAttributes))
+        {
+            $this->_mAttributes['name'] = $this->_mId;
+        }
+        
+        if(array_key_exists("name", $this->_mAttributes))
+        {
+            $this->set_mName($this->_mAttributes['name']);
+        }
+        
+    }
+    
+    public function buildAttributes()
     {
         
         $str_attr = "";
-        if(!empty($attributes))
+        if($this->_mCheckName === true)
         {
-            foreach($attributes as $attr => $value)
+            $this->checkAttributeName();
+        }
+        
+        if(!empty($this->_mAttributes))
+        {
+            foreach($this->_mAttributes as $attr => $value)
             {
                 $str_attr .= " " . $attr . "=\"" . $value . "\"";
             }
@@ -77,10 +117,13 @@ abstract class BaseElement implements InterfaceElement, ElementObservable{
     
     public function build(){
         $attr = "";
-        if(!is_null($this->_mAttributes))
+        
+        if(is_null($this->_mAttributes))
         {
-            $attr = $this->buildAttributes($this->_mAttributes);
+            $this->_mAttributes = array();
         }
+        
+        $attr = $this->buildAttributes();
         $this->_mSkeleton = sprintf($this->_mSkeleton, $attr);
         return $this->_mSkeleton;
     }
@@ -107,6 +150,21 @@ abstract class BaseElement implements InterfaceElement, ElementObservable{
         }
     }
     
+    public function isValid($value)
+    {
+        if(!empty($this->_mValidations))
+        {
+            foreach($this->_mValidations as /* @var $validation BaseValidation */ $validation)
+            {
+                if(!$validation->isValid($value))
+                {
+                    $this->_mErrors[] = $validation->get_mErrorMessage();
+                }
+            }
+        }
+        return (!empty($this->_mErrors)) ? false : true;
+    }
+    
     public function addObserver(FormGenerator $observer) {
         $this->_mObservers[] = $observer;
     }
@@ -115,6 +173,7 @@ abstract class BaseElement implements InterfaceElement, ElementObservable{
         if(!empty($this->_mObservers)){
             foreach($this->_mObservers  as $observers)
             {
+                /* @var $observers FormGenerator */
                 $observers->update($this, $info);
             }
         }
@@ -126,6 +185,18 @@ abstract class BaseElement implements InterfaceElement, ElementObservable{
 
     public function set_mId($_mId) {
         $this->_mId = $_mId;
+    }
+    
+    public function get_mName() {
+        return $this->_mName;
+    }
+
+    public function set_mName($_mName) {
+        $this->_mName = $_mName;
+    }
+    
+    public function get_mErrors() {
+        return $this->_mErrors;
     }
     
 }

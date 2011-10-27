@@ -9,6 +9,7 @@ final class LabelElement extends BaseElement{
     {
         parent::__construct($config);
         $this->_mSkeleton = "<label%s>-data-</label>";
+        $this->_mCheckName = false;
     }
     
     public function build() {

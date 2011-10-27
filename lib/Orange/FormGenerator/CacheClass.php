@@ -99,4 +99,9 @@ class CacheClass{
             }
         }
     }
+    
+    public static function expectedCacheName($idForm, $config_file, $template_file)
+    {
+        return $idForm . "_" . md5(md5_file($config_file) . md5_file($template_file));
+    }
 }

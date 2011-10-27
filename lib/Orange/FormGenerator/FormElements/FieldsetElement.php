@@ -9,6 +9,7 @@ final class FieldsetElement extends BaseElement{
     {
         parent::__construct($config);
         $this->_mSkeleton = "<fieldset%s>-data-</fieldset>";
+        $this->_mCheckName = false;
     }
     
     public function getOpenAndCloseTag()

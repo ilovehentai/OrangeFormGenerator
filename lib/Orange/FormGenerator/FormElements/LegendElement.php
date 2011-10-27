@@ -9,6 +9,7 @@ final class LegendElement extends BaseElement{
     {
         parent::__construct($config);
         $this->_mSkeleton = "<legend%s>-data-</legend>";
+        $this->_mCheckName = false;
     }
     
     public function build() {

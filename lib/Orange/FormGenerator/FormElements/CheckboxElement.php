@@ -13,6 +13,9 @@ final class CheckboxElement extends InputElement{
     
     public function build() {
         $str_element = "";
+        
+        $this->checkAttributeName();
+        
         if(array_key_exists("group", $this->_mElementData) && is_array($this->_mElementData['group']))
         {
             $list_tmp_checkbox = array();
