@@ -25,7 +25,7 @@ $nome_pessoal = "John Doe";
         <?php
                 try{
 
-                        $form = new FormGenerator("teste", "example.yml", array("nome_pessoal" => $nome_pessoal));
+                        $form = new FormGenerator("teste", "example.yml", "", array("nome_pessoal" => $nome_pessoal));
                         echo $form;
                         $form->set_mDebug(true);
                         echo $form;

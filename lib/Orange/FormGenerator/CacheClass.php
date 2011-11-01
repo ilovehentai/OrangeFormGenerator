@@ -18,7 +18,7 @@ class CacheClass{
         }
         else
         {
-            self::$_cache_path = __DIR__ . DIRECTORY_SEPARATOR . "/cache/";
+            self::$_cache_path = FormConfig::getDefaultCacheDir();
         }
         
     }   
@@ -28,7 +28,6 @@ class CacheClass{
      */
     public static function iniCache()
     {
-        self::setCachePath();
         if(!is_dir(self::$_cache_path))
         {
             if(!mkdir(self::$_cache_path))
@@ -46,7 +45,7 @@ class CacheClass{
      */
     public static function saveDataFile($file, $data, $asUniq = false)
     {
-        file_put_contents(self::$_cache_path . DIRECTORY_SEPARATOR . $file, $data);
+        file_put_contents(self::$_cache_path . $file, $data);
     }
     
     /**
@@ -58,7 +57,7 @@ class CacheClass{
     {
         $result = false;
         
-        if(is_file(self::$_cache_path . DIRECTORY_SEPARATOR . $file))
+        if(is_file(self::$_cache_path . $file))
         {
             $result = true;
         }
@@ -75,7 +74,7 @@ class CacheClass{
     {
         if(self::checkCacheFile($file))
         {
-            return file_get_contents(self::$_cache_path . DIRECTORY_SEPARATOR . $file);
+            return file_get_contents(self::$_cache_path . $file);
         }
         
         return false;
@@ -92,7 +91,7 @@ class CacheClass{
             if (($handle = opendir(self::$_cache_path))){
                 while (false !== ($file = readdir($handle))) {
                     if (preg_match("/^" . $idForm . "_([0-9abcdef])+\.php$/", $file)) {
-                        unlink(self::$_cache_path . DIRECTORY_SEPARATOR . $file);
+                        unlink(self::$_cache_path . $file);
                     }
                 }
                 closedir($handle);

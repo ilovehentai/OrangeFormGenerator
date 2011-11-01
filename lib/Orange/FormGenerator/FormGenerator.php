@@ -13,6 +13,7 @@ use FormGenerator\Patterns\FormGeneratorObserver;
 use FormGenerator\FormGeneratorException\FormGeneratorException;
 use FormGenerator\Validation\ValidationConfigClass;
 use FormGenerator\CacheClass;
+use FormGenerator\FormConfig;
 
 
 class FormGenerator implements FormGeneratorObserver{
@@ -112,13 +113,14 @@ class FormGenerator implements FormGeneratorObserver{
      * @param array $elements_values
      * @return FormGenerator
      */
-    public function __construct($idform, $configFile = "", array $elements_default_values = array())
-    {
+    public function __construct($idform, $configFile = "", $cacheDir = "", array $elements_default_values = array())
+    {   
+        
         if(!empty($configFile))
         {
-            if(is_string($configFile) && is_file(OFG_CONFIG_DIR . $configFile))
+            if(is_string($configFile) && is_file(FormConfig::getConfigDir() . $configFile))
             {
-                $this->_mConfigFile = OFG_CONFIG_DIR . $configFile;
+                $this->_mConfigFile = FormConfig::getConfigDir() . $configFile;
             }
             else
             {
@@ -127,7 +129,7 @@ class FormGenerator implements FormGeneratorObserver{
         }
         else
         {
-            $this->_mConfigFile = OFG_CONFIG_DIR . OFG_CONFIG_FILE;
+            $this->_mConfigFile = FormConfig::getDefaultConfigFile();
         }
         
         if(!empty($elements_default_values) && is_array($elements_default_values))
@@ -135,7 +137,9 @@ class FormGenerator implements FormGeneratorObserver{
             self::$_mElementsDefaultValues = $elements_default_values;
         }
         
-        ValidationConfigClass::getInstance()->loadValidationConfigFile(OFG_CONFIG_DIR . OFG_VALIDATION_CONFIG_FILE);
+        CacheClass::setCachePath($cacheDir);
+       
+        ValidationConfigClass::getInstance()->loadValidationConfigFile(FormConfig::getDefaultValidationFile());
         $this->_mId = $idform;
     }
         
