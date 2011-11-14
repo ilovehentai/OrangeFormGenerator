@@ -140,6 +140,7 @@ class FormGenerator implements FormGeneratorObserver{
         CacheClass::setCachePath($cacheDir);
        
         ValidationConfigClass::getInstance()->loadValidationConfigFile(FormConfig::getDefaultValidationFile());
+        
         $this->_mId = $idform;
     }
         
@@ -150,7 +151,7 @@ class FormGenerator implements FormGeneratorObserver{
      */
     public function __sleep() {
         //Save only important info
-        return array("_mError", "_mElements", "_mListValidators", "_mReadOnly");
+        return array("_mId", "_mErrorsInForm", "_mElements", "_mListValidators", "_mReadOnly");
     }
     
     public function __wakeup() {
@@ -235,7 +236,7 @@ class FormGenerator implements FormGeneratorObserver{
     
     /**
      * Create Javascript JSON for validation and place it in JS template
-     * @return string 
+     * @return string|null 
      */
     public function buildJavaScript()
     {
@@ -252,13 +253,19 @@ class FormGenerator implements FormGeneratorObserver{
                                     $fields['rule'] . '", msg : "' . 
                                     $fields['message'] . '"}';
                 }
-
+                
                 $jsFields = implode(",\n", $jsFields);
+                
+                $content = file_get_contents(__DIR__ . $js_validation_data["js_template"]);
+                
+                return sprintf($content, $jsFields, $js_validation_data["title_msg"], 
+                                        $js_validation_data["error_msg"], $this->_mFormData['form']['id']);
+            }else{
+                
+                return null;
             }
             
-            $content = file_get_contents(__DIR__ . $js_validation_data["js_template"]);
-            return sprintf($content, $jsFields, $js_validation_data["title_msg"], 
-                                        $js_validation_data["error_msg"], $this->_mFormData['form']['id']);
+            
         }
     }
     
@@ -660,36 +667,39 @@ class FormGenerator implements FormGeneratorObserver{
     public static function isValid($formId)
     {
         $valid = true;
+        
+        // cleans previous errors
         self::clearErrors($formId);
         
         if(!empty($formId))
         {
             $formObj = self::getFormData($formId);
-            if($formObj instanceof \FormGenerator)
+            
+            
+            if(get_class($formObj) == "FormGenerator\FormGenerator")
             {
                 if(count($formObj->get_mListValidators()) > 0 && count($formObj->get_mElements()) > 0)
                 {
-                    if($_SERVER["REQUEST_METHOD"] == "POST")
-                    {
-                        $submited_data = $_POST;
-                    }
-                    else
-                    {
-                        $submited_data = $_GET;
-                    }
-
+                    $submited_data = $_SERVER["REQUEST_METHOD"] == "POST" ? $_POST : $_GET;
                     
-                    foreach($formObj->get_mElements() as $element)
-                    {
-                        /* @var $element BaseElement */
-                        if($element instanceof FormElements\FileElement)
+                    if($submited_data){
+                        
+                        foreach($formObj->get_mElements() as $element)
                         {
-                            $submited_data[$name] = $_FILES[$name]["name"];
-                        }
+                            /* @var $element BaseElement */
+                            if(get_class($element) == "FormGenerator\FormElements\FileElement")
+                            {
+                                $submited_data[$element->get_mName()] = $_FILES[$element->get_mName()]["name"];
+                            }
+                            
+                            
+                            if(!$element->isValid($submited_data[$element->get_mName()])) {
 
-                        if(!$element->isValid($submited_data[$element->get_mName()])) {
-                            $formObj->setErrors($element->get_mErrors());
-                        }	
+                                $formObj->setErrors($element->get_mErrors());
+                                $valid = false;
+                            }	
+                        }
+                        
                     }
                 }
             }
@@ -706,6 +716,7 @@ class FormGenerator implements FormGeneratorObserver{
     {
         $this->_mErrorsInForm .= implode("<br/>", $errors);
     }
+    
     
     /**
      * Retrieve FormGenerator object from session
@@ -748,11 +759,16 @@ class FormGenerator implements FormGeneratorObserver{
         return false;
     }
     
+    
+    /**
+     * Clear erros in session for formId
+     * @param string $formId 
+     */
     public static function clearErrors($formId)
     {
         $form = self::getFormData($formId);
         $form->set_mErrorsInForm("");
         $form->save();
     }
-    
+
 }

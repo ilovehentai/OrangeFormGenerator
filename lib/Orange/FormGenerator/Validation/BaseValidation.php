@@ -12,20 +12,22 @@ class BaseValidation implements ValidationInterface{
     protected $_mErrorMessage;
 
     
-    public function __construct()
+    public function __construct($config)
     {
-        
+        $this->_mErrorMessage = $config['message'];
+        $this->_mErrorMsg = $config['message'];
     }
 
     public function isValid($value) {
         
         if(!empty($value) && preg_match($this->_mExpression, $value))
-        {
+        {   
+            
             return true;
         }
         else
         {
-            return $this->_mErrorMessage;
+            return false;
         }
     }
     

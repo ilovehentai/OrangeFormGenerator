@@ -3,7 +3,7 @@ require_once(__DIR__ . DIRECTORY_SEPARATOR . "/lib/init.php");
 use FormGenerator\FormGenerator;
 
 /** Initialize variables **/
-$nome_pessoal = "John Doe";
+$nome_pessoal = "";
 ?>
 <!DOCTYPE html>
 <html>
@@ -23,18 +23,30 @@ $nome_pessoal = "John Doe";
     <body>
         <img alt="logo" src="/images/logo.png" />
         <?php
-                try{
+        
+        if(isset($_POST['submit'])){
+            
+            if(FormGenerator::isValid('simple_form')){
+                echo "submetido com sucesso";
+            }else{
+                echo "ERROS";
 
-                        $form = new FormGenerator("teste", "example.yml", "", array("nome_pessoal" => $nome_pessoal));
-                        echo $form;
-                        $form->set_mDebug(true);
-                        echo $form;
+            }            
+            
+        }else{
+            try {
 
-                }catch(FormGeneratorException $e){
-                    print_r($e->getTraceAsString());
-                }catch(Exception $e){
-                    print_r($e->getTraceAsString());
-                }
+                $form = new FormGenerator("simple_form", "example.yml", "", array("nome_pessoal" => $nome_pessoal));
+                echo $form;
+                $form->set_mDebug(true);
+                echo $form;
+                
+            } catch (FormGeneratorException $e) {
+                print_r($e->getTraceAsString());
+            } catch (Exception $e) {
+                print_r($e->getTraceAsString());
+            }
+        }
         ?>
     </body>
 </html>

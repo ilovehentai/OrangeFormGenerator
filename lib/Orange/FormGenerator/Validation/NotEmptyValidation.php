@@ -3,11 +3,9 @@
 namespace FormGenerator\Validation;
 
 class NotEmptyValidation extends BaseValidation{
-    protected $_mExpression;
-    protected $_mErrorMessage;
     
-    public function __construct() {
-        parent::__construct();
+    public function __construct($config) {
+        parent::__construct($config);
         $this->_mExpression = "/(.){1,}/";
     }
     

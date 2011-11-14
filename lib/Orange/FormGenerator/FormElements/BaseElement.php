@@ -156,12 +156,15 @@ abstract class BaseElement implements InterfaceElement, ElementObservable{
         {
             foreach($this->_mValidations as /* @var $validation BaseValidation */ $validation)
             {
+                
                 if(!$validation->isValid($value))
                 {
+                    
                     $this->_mErrors[] = $validation->get_mErrorMessage();
                 }
             }
         }
+        
         return (!empty($this->_mErrors)) ? false : true;
     }
     
