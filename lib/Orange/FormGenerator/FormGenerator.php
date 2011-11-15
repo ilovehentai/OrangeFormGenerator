@@ -306,7 +306,7 @@ class FormGenerator implements FormGeneratorObserver{
                     $this->_mformElement->setStream($stream);
                     $stream = $this->_mformElement->build();
 
-                    $stream .= $this->buildJavaScript();
+                    //$stream .= $this->buildJavaScript();
 
                     CacheClass::clearFileCache($this->_mId);
                     CacheClass::saveDataFile($cache_name, $stream);
@@ -675,7 +675,6 @@ class FormGenerator implements FormGeneratorObserver{
         {
             $formObj = self::getFormData($formId);
             
-            
             if(get_class($formObj) == "FormGenerator\FormGenerator")
             {
                 if(count($formObj->get_mListValidators()) > 0 && count($formObj->get_mElements()) > 0)
@@ -694,7 +693,6 @@ class FormGenerator implements FormGeneratorObserver{
                             
                             
                             if(!$element->isValid($submited_data[$element->get_mName()])) {
-
                                 $formObj->setErrors($element->get_mErrors());
                                 $valid = false;
                             }	
@@ -704,7 +702,7 @@ class FormGenerator implements FormGeneratorObserver{
                 }
             }
         }
-        
+        $formObj->save();
         return $valid;
     }
     
@@ -717,6 +715,13 @@ class FormGenerator implements FormGeneratorObserver{
         $this->_mErrorsInForm .= implode("<br/>", $errors);
     }
     
+    /**
+     * Get the form error message
+     * @return type 
+     */
+    public function get_mErrorsInForm() {
+        return $this->_mErrorsInForm;
+    }
     
     /**
      * Retrieve FormGenerator object from session
@@ -769,6 +774,16 @@ class FormGenerator implements FormGeneratorObserver{
         $form = self::getFormData($formId);
         $form->set_mErrorsInForm("");
         $form->save();
+    }
+    
+    /**
+     * Clear erros in session for formId
+     * @param string $formId 
+     */
+    public static function getFormErrors($formId)
+    {
+        $form = self::getFormData($formId);
+        return $form->get_mErrorsInForm();
     }
 
 }

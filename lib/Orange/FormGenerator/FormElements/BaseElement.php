@@ -37,7 +37,7 @@ abstract class BaseElement implements InterfaceElement, ElementObservable{
         }
         
         $this->_mElementData = $config;
-        
+        $this->_mErrors = array();
     }
     
     /**
@@ -152,6 +152,7 @@ abstract class BaseElement implements InterfaceElement, ElementObservable{
     
     public function isValid($value)
     {
+        $this->_mErrors = array();
         if(!empty($this->_mValidations))
         {
             foreach($this->_mValidations as /* @var $validation BaseValidation */ $validation)
@@ -159,7 +160,6 @@ abstract class BaseElement implements InterfaceElement, ElementObservable{
                 
                 if(!$validation->isValid($value))
                 {
-                    
                     $this->_mErrors[] = $validation->get_mErrorMessage();
                 }
             }

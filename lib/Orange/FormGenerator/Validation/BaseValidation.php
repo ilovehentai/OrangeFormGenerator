@@ -22,13 +22,10 @@ class BaseValidation implements ValidationInterface{
         
         if(!empty($value) && preg_match($this->_mExpression, $value))
         {   
-            
             return true;
         }
-        else
-        {
-            return false;
-        }
+        return false;
+        
     }
     
     public function getExpression() {

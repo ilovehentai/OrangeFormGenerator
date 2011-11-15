@@ -17,7 +17,7 @@ abstract class InputElement extends BaseElement{
     protected function setValue()
     {
         
-        if(!array_key_exists("value", $this->_mAttributes))
+        if(!array_key_exists("value", $this->_mAttributes) || empty($this->_mAttributes['value']))
         {
              $this->_mAttributes['value'] = "";
         }

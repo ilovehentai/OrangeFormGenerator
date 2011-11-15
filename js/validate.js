@@ -12,7 +12,18 @@
             "phone" : /^([(][0-9-+ ]+[)]|[0-9-+ ]*)?[0-9 ]{9,}([(][a-zA-Z0-9. ]+[)]|[a-zA-Z0-9. ]+)?$/,
             "email" : /^[a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\.([a-zA-Z]{2,4}\.)?[a-zA-Z]{2,4}$/,
             "selected" : /^[1-9]{1}([0-9])*$/,
-            "regExpression" : /(.)/
+            "regExpression" : function(regex){
+                return regex;
+            },
+            "not_null_value" : /[^null]/,
+            "nif" : /[0-9]{9}/,
+            "zip_code" : /([1-9]{1}[0-9]{3}-[0-9]{3}|[1-9]{1}[0-9]{3})/,
+            "min_size" : function(size){
+                return "(.){" + size + ",}";
+            },
+            "match" : function(val){
+                return $("#" + val).val();
+            }
             //checked
         };
         
@@ -51,7 +62,20 @@
                                 }
                                 break;
                             default:
-                                if(!value.match(masks[val.validator]))
+                                regex = null;
+                                if(val.validator.indexOf(":") > -1)
+                                {
+                                    var valreg = (val.validator).substr((val.validator).indexOf(":") + 1, (val.validator).length);
+                                    var validator = (val.validator).substr(0, (val.validator).indexOf(":"));
+                                    
+                                    regex = masks[validator](valreg);
+                                }
+                                else
+                                {
+                                    regex = masks[val.validator];
+                                }
+                                
+                                if(!value.match(regex))
                                 {
                                     valid = false;
                                 }

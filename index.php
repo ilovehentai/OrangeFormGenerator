@@ -29,14 +29,13 @@ $nome_pessoal = "";
             if(FormGenerator::isValid('simple_form')){
                 echo "submetido com sucesso";
             }else{
-                echo "ERROS";
-
+                echo FormGenerator::getFormErrors('simple_form');
             }            
             
         }else{
             try {
 
-                $form = new FormGenerator("simple_form", "example.yml", "", array("nome_pessoal" => $nome_pessoal));
+                $form = new FormGenerator("simple_form", "simple.yml", "", array("nome_pessoal" => $nome_pessoal));
                 echo $form;
                 $form->set_mDebug(true);
                 echo $form;
