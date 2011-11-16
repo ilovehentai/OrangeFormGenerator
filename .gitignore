@@ -1,0 +1,3 @@
+/lib/Orange/FormGenerator/cache/*
+!.gitignore
+
