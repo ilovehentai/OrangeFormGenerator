@@ -5,7 +5,7 @@ namespace FormGenerator;
 class FormConfig {
     
     const OFG_VALIDATION_CONFIG_FILE = 'validators.yml';
-    const OFG_CONFIG_FILE = 'defaultform.yml';
+    const OFG_CONFIG_FILE = 'example.yml';
     const OFG_CONFIG_DIR = 'Configs';
     const OFG_DEFAULT_CACHE_DIR = 'cache';
     

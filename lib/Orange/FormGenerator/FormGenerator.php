@@ -25,6 +25,12 @@ class FormGenerator implements FormGeneratorObserver{
     private $_mConfigFile;
     
     /**
+     * Yaml Form configuration path files
+     * @var string 
+     */
+    private $_mConfigDir;
+    
+    /**
      * Html Form template
      * @var string 
      */
@@ -97,6 +103,12 @@ class FormGenerator implements FormGeneratorObserver{
     private $_mErrorsInForm = "";
     
     /**
+     * Template form directory path
+     * @var string 
+     */
+    private $_mTemplateDir = "";
+    
+    /**
      * List of defaults values for elements
      * @var array 
      */
@@ -109,39 +121,13 @@ class FormGenerator implements FormGeneratorObserver{
      * it will check whether the file exists and set it as the configuration file
      * if not throws an exception
      * @param string $idform
-     * @param string $configFile 
-     * @param array $elements_values
+     * @param array $args 
      * @return FormGenerator
      */
-    public function __construct($idform, $configFile = "", $cacheDir = "", array $elements_default_values = array())
+    public function __construct($idform, array $args = array())
     {   
-        
-        if(!empty($configFile))
-        {
-            if(is_string($configFile) && is_file(FormConfig::getConfigDir() . $configFile))
-            {
-                $this->_mConfigFile = FormConfig::getConfigDir() . $configFile;
-            }
-            else
-            {
-                throw new \Exception("Config file not found.");
-            }
-        }
-        else
-        {
-            $this->_mConfigFile = FormConfig::getDefaultConfigFile();
-        }
-        
-        if(!empty($elements_default_values) && is_array($elements_default_values))
-        {
-            self::$_mElementsDefaultValues = $elements_default_values;
-        }
-        
-        CacheClass::setCachePath($cacheDir);
-       
-        ValidationConfigClass::getInstance()->loadValidationConfigFile(FormConfig::getDefaultValidationFile());
-        
         $this->_mId = $idform;
+        $this->checkArguments($args);
     }
         
     /**
@@ -286,7 +272,6 @@ class FormGenerator implements FormGeneratorObserver{
      */
     public function render($template = "")
     {
-        
         if(is_file($this->_mConfigFile))
         {
             try{
@@ -295,7 +280,8 @@ class FormGenerator implements FormGeneratorObserver{
                 $this->loadTemplate($template);
                 
                 CacheClass::iniCache();
-                $cache_name = CacheClass::expectedCacheName($this->_mId, $this->_mConfigFile, __DIR__ . $this->_mTemplate);
+                $cache_name = CacheClass::expectedCacheName($this->_mId, $this->_mConfigFile,
+                                                                $this->_mTemplateDir . DIRECTORY_SEPARATOR . $this->_mTemplate);
                 $stream = CacheClass::checkCacheFile($cache_name);
 
                 if($stream === false || $this->_mDebug === true)
@@ -306,7 +292,7 @@ class FormGenerator implements FormGeneratorObserver{
                     $this->_mformElement->setStream($stream);
                     $stream = $this->_mformElement->build();
 
-                    //$stream .= $this->buildJavaScript();
+                    $stream .= $this->buildJavaScript();
 
                     CacheClass::clearFileCache($this->_mId);
                     CacheClass::saveDataFile($cache_name, $stream);
@@ -349,7 +335,127 @@ class FormGenerator implements FormGeneratorObserver{
         return $text_area->build();
     }
     
+    
+    /**
+     * Define the configuration files directory
+     * @param string $configDir 
+     */
+    public function defineTheConfigDirectory($configDir="")
+    {
+        if(!empty($configDir))
+        {
+            $this->_mConfigDir = $configDir;
+        }
+        else
+        {
+            $this->_mConfigDir = FormConfig::getConfigDir();
+        }
+    }
+    
+    /**
+     * Define the configuration file, let the class know where to look for external informations
+     * about the form
+     * @param string $configFile 
+     */
+    public function defineTheConfigFile($configFile="")
+    {
+        if(!empty($configFile))
+        {
+            if(is_string($configFile) && is_file($this->_mConfigDir . $configFile))
+            {
+                $this->_mConfigFile = $this->_mConfigDir . $configFile;
+            }
+            else
+            {
+                throw new \Exception("Config file not found.");
+            }
+        }
+        else
+        {
+            $this->_mConfigFile = FormConfig::getDefaultConfigFile();
+        }
+    }
+    
+    /**
+     * Define the directory where to store the cache
+     * @param string $cacheDir 
+     */
+    public function defineCacheDirectory($cacheDir = "")
+    {
+        CacheClass::setCachePath($cacheDir);
+    }
+    
+    /**
+     * Define the elements defaults values to output
+     * @param array $elements_default_values 
+     */
+    public function defineElementsDefaultsValues(array $elements_default_values = null)
+    {
+        if(!empty($elements_default_values) && is_array($elements_default_values))
+        {
+            self::$_mElementsDefaultValues = $elements_default_values;
+        }
+    }
+    
+    /**
+     * define the validation file
+     * @param string $validationFile 
+     */
+    public function defineValidationFile($validationFile = "")
+    {
+        if(empty($validationFile))
+        {
+            $validationFile = FormConfig::getDefaultValidationFile();
+        }
+        
+        ValidationConfigClass::getInstance()->loadValidationConfigFile($validationFile);
+    }
+    
+    /**
+     * Define the template directory
+     * @param type $templateDirPath 
+     */
+    public function defineTemplateDirectory($templateDirPath = "")
+    {
+        if(!empty($templateDirPath))
+        {
+            $this->_mTemplateDir = $templateDirPath;
+        }
+        else
+        {
+            $this->_mTemplateDir = __DIR__;
+        }
+    }
+    
+    
     /** Private Methods **/
+    
+    /**
+     * check and site formGenerator basic arguments. Non valid arguments are ignored.
+     * @param array $args 
+     */
+    private function checkArguments(array $args = array())
+    {
+        $valid_arguments = array(
+                                 "configDir" => "defineTheConfigDirectory", 
+                                 "configFile" => "defineTheConfigFile", 
+                                 "cacheDir" => "defineCacheDirectory",
+                                 "templateDir" => "defineTemplateDirectory",
+                                 "elements_default_values" => "defineElementsDefaultsValues",
+                                 "validationFile" => "defineValidationFile"
+                                );
+        
+        
+        foreach($valid_arguments as $key => $method)
+        {
+            if(!array_key_exists($key, $args))
+            {
+                $args[$key] = null;
+            }
+            $this->$method($args[$key]);
+        }
+        
+    }
     
     /**
      * Set the template name
@@ -377,10 +483,10 @@ class FormGenerator implements FormGeneratorObserver{
      */
     private function getTemplateStream()
     {
-        if(is_file(__DIR__ . $this->_mTemplate))
+        if(is_file($this->_mTemplateDir . $this->_mTemplate))
         {
             ob_start();
-            include(__DIR__ . $this->_mTemplate);
+            include($this->_mTemplateDir . $this->_mTemplate);
             return ob_get_clean();
         }
         else
