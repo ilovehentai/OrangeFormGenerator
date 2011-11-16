@@ -1,5 +1,5 @@
 <?php
-require_once(__DIR__ . DIRECTORY_SEPARATOR . "/lib/init.php");
+require_once(__DIR__ . DIRECTORY_SEPARATOR . "/example/init.php");
 use FormGenerator\FormGenerator;
 
 /** Initialize variables **/
@@ -34,11 +34,17 @@ $nome_pessoal = "";
             
         }else{
             try {
-
-                $form = new FormGenerator("simple_form", "simple.yml", "", array("nome_pessoal" => $nome_pessoal));
-                echo $form;
+                $form = new FormGenerator("simple_form", 
+                                            array(
+                                                 "configDir" => __DIR__ . "/example/configs/",
+                                                 "cacheDir" => __DIR__ . "/example/cache/",
+                                                 "configFile" => "simple.yml",
+                                                 "templateDir" => __DIR__ . "/example/configs/",
+                                                 "elements_default_values" => array("nome_pessoal" => $nome_pessoal)
+                                                ));
+                echo $form->render();
                 $form->set_mDebug(true);
-                echo $form;
+                echo $form->renderDebug();
                 
             } catch (FormGeneratorException $e) {
                 print_r($e->getTraceAsString());
