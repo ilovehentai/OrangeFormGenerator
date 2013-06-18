@@ -1,5 +1,5 @@
 <?php
-require_once(__DIR__ . DIRECTORY_SEPARATOR . "/example/init.php");
+require_once(__DIR__ . DIRECTORY_SEPARATOR . "example" . DIRECTORY_SEPARATOR . "init.php");
 use FormGenerator\FormGenerator;
 
 /** Initialize variables **/
@@ -38,7 +38,7 @@ $nome_pessoal = "";
                                             array(
                                                  "configDir" => __DIR__ . "/example/configs/",
                                                  "cacheDir" => __DIR__ . "/example/cache/",
-                                                 "configFile" => "simple.yml",
+                                                 "configFile" => "example.yml",
                                                  "templateDir" => __DIR__ . "/example/configs/",
                                                  "elements_default_values" => array("nome_pessoal" => $nome_pessoal)
                                                 ));
