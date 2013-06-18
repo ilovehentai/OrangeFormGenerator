@@ -3,6 +3,9 @@ namespace FormGenerator\FormGeneratorSimpleTemplateEngine;
 
 use FormGenerator\FormElements\BaseElement;
 use FormGenerator\FormElements\FieldsetElement;
+use FormGenerator\Collection;
+use FormGenerator\FormGeneratorException\FormGeneratorException;
+use FormGenerator\FormElements\FormElement;
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
@@ -16,6 +19,10 @@ use FormGenerator\FormElements\FieldsetElement;
 class BaseTemplateEngine {
     
     private $_template_path = "";
+    private $_form_tag;
+    private $_elementsCollection;
+    private $_fieldsetCollection;
+    private $_js = "";
     
     /**
      * Load and return the html template buffer as a string
@@ -34,22 +41,22 @@ class BaseTemplateEngine {
         }
         else
         {
-            throw new FormGeneratorException("Error no template file");
+            throw new FormGeneratorException("Error no template file", __FILE__);
         }
     }
     
     
     /**
      * Place the fieldset and legends elemets into the html template
-     * @param Collector $elements
-     * @param Collector $fieldset
+     * @param string $stream
+     * @param Collection $fieldsetCollection
      * @return string 
      */
-    private function placeFieldsetElements($stream, $fieldset = array())
+    private function placeFieldsetElements($stream, Collection $fieldsetCollection)
     {
-        if(!empty($fieldset))
+        if(!empty($fieldsetCollection))
         {
-            foreach($fieldset as $key => /* @var $element FieldsetElement */ $element)
+            foreach($fieldsetCollection as $key => /* @var $element FieldsetElement */ $element)
             {
                 $element->build();
                 $fieldset_parts = $element->getOpenAndCloseTag();
@@ -69,18 +76,18 @@ class BaseTemplateEngine {
     
     /**
      * Place the form and labels elemets into the html template
-     * @param Collector $elements
-     * @param Collector $fieldset
+     * @param Collection $elementsCollection
+     * @param Collection $fieldsetCollection
      * @return string 
      */
-    public function placeFormElements($elements, $fieldset)
+    public function placeFormElements(Collection $elementsCollection, Collection $fieldsetCollection)
     {
         $stream = $this->getTemplateStream();
-        $stream = $this->placeFieldsetElements($stream, $fieldset);
+        $stream = $this->placeFieldsetElements($stream, $fieldsetCollection);
         
-        if(!empty($elements))
+        if(!empty($elementsCollection))
         {
-            foreach($elements as $key => /* @var $element BaseElement */ $element)
+            foreach($elementsCollection as $key => /* @var $element BaseElement */ $element)
             {
                 $stream = str_replace("{%" . $element->get_mId() . "%}", $element->build(), $stream);
                 if(is_a($element->get_mlabel(), "FormGenerator\FormElements\LabelElement"))
@@ -94,12 +101,48 @@ class BaseTemplateEngine {
         return $stream;
     }
     
+    public function compile() {
+        $html = $this->placeFormElements($this->_elementsCollection, $this->_fieldsetCollection);
+        $this->_form_tag->setStream($html);
+        $html = $this->_form_tag->build();
+        $html .= $this->_js;
+        return $html;
+    }
+    
+    public function addJavaScript($jscript) {
+        $this->_js = $jscript;
+    }
+    
     public function get_template_path() {
         return $this->_template_path;
     }
 
     public function set_template_path($_template_path) {
         $this->_template_path = $_template_path;
+    }
+
+    public function get_form_tag() {
+        return $this->_form_tag;
+    }
+
+    public function set_form_tag(FormElement $_form_tag) {
+        $this->_form_tag = $_form_tag;
+    }
+
+    public function get_elementsCollection() {
+        return $this->_elementsCollection;
+    }
+
+    public function set_elementsCollection(Collection $elementsCollection) {
+        $this->_elementsCollection = $elementsCollection;
+    }
+
+    public function get_fieldsetCollection() {
+        return $this->_fieldsetCollection;
+    }
+
+    public function set_fieldsetCollection(Collection $fieldsetCollection) {
+        $this->_fieldsetCollection = $fieldsetCollection;
     }
 
 

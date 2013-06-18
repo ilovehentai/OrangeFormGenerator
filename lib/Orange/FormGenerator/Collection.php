@@ -11,16 +11,16 @@ namespace FormGenerator;
  *
  * @author josesantos
  */
-class Collection implements IteratorAggregate
+class Collection implements \IteratorAggregate
 {
     private $_items = array();
     private $_count = 0;
     
     public function getIterator() {
         return new CollectionIterator($this->_items);
-    } //put your code here
+    }
     
     public function add($value) {
-        $this->items[$this->_count++] = $value;
+        $this->_items[$this->_count++] = $value;
     }
 }

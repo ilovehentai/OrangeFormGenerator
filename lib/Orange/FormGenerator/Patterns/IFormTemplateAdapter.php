@@ -1,5 +1,7 @@
 <?php
 namespace FormGenerator\Patterns;
+use FormGenerator\Collection;
+use FormGenerator\FormElements\FormElement;
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
@@ -10,6 +12,8 @@ namespace FormGenerator\Patterns;
  * @author josesantos
  */
 interface IFormTemplateAdapter {
-    function placeFormElements($elements, $fieldset);
     function setTemplatePath($path);
+    function setFormElements(FormElement $formElement, Collection $elementsCollection, Collection $fieldsetCollection);
+    function render();
+    function addJavaScript($jscript);
 }

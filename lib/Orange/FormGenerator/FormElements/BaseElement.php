@@ -6,6 +6,7 @@ use FormGenerator\FormGenerator;
 use FormGenerator\Patterns\ValidationFactory;
 use FormGenerator\Patterns\ElementObservable;
 use FormGenerator\Validation\ValidationConfigClass;
+use FormGenerator\FormElements\LabelElement;
 
 abstract class BaseElement implements InterfaceElement, ElementObservable{
     
@@ -18,6 +19,7 @@ abstract class BaseElement implements InterfaceElement, ElementObservable{
     protected $_mName;
     protected $_mErrors = array();
     protected $_mCheckName = true;
+    protected $_mlabel;
     
     /**
      * Create a BaseElemet Object, recieve a configuration array containing 
@@ -138,7 +140,7 @@ abstract class BaseElement implements InterfaceElement, ElementObservable{
     
     protected function setValue()
     {
-        if(!array_key_exists("text", $this->_mElementData))
+        if(!array_key_exists("text", $this->_mElementData) || empty($this->_mElementData['text']))
         {
              $this->_mElementData['text'] = "";
         }
@@ -202,5 +204,12 @@ abstract class BaseElement implements InterfaceElement, ElementObservable{
         return $this->_mErrors;
     }
     
+    public function get_mlabel() {
+        return $this->_mlabel;
+    }
+
+    public function set_mlabel(LabelElement $_mlabel) {
+        $this->_mlabel = $_mlabel;
+    }
+    
 }
-?>

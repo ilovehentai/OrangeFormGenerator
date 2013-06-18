@@ -1,7 +1,6 @@
 <?php
 
 namespace FormGenerator\Patterns;
-use FormGenerator\FormElements\TextElement;
 
 class ElementFactory{
     

@@ -10,7 +10,7 @@ namespace FormGenerator;
  *
  * @author josesantos
  */
-class CollectionIterator implements Iterator{
+class CollectionIterator implements \Iterator{
     
     private $_list;
     

@@ -14,7 +14,7 @@ use FormGenerator\FormGeneratorException\FormGeneratorException;
 use FormGenerator\Validation\ValidationConfigClass;
 use FormGenerator\CacheClass;
 use FormGenerator\FormConfig;
-
+use FormGenerator\Collection;
 
 class FormGenerator implements FormGeneratorObserver{
     
@@ -62,27 +62,15 @@ class FormGenerator implements FormGeneratorObserver{
     
     /**
      * List of BaseElement Objects
-     * @var array 
+     * @var Collection 
      */
-    private $_mElements = array();
+    private $_mElements;
     
     /**
      * List of FieldsetElement Objects
-     * @var array 
+     * @var Collection 
      */
-    private $_mFieldset = array();
-    
-    /**
-     * List of LegendElement Objects
-     * @var array 
-     */
-    private $_mLegends = array();
-    
-    /**
-     * List of LabelsElement Objects
-     * @var array 
-     */
-    private $_mLabels = array();
+    private $_mFieldset;
     
     /**
      * FormElement Object
@@ -128,6 +116,8 @@ class FormGenerator implements FormGeneratorObserver{
     {   
         $this->_mId = $idform;
         $this->checkArguments($args);
+        $this->_mElements = new Collection();
+        $this->_mFieldset = new Collection();
     }
         
     /**
@@ -182,11 +172,13 @@ class FormGenerator implements FormGeneratorObserver{
     public function addFieldset(FieldsetElement $element, LegendElement $legend = null)
     {
         
-        array_push($this->_mFieldset, $element);
         if(is_a($legend, "FormGenerator\FormElements\LegendElement"))
         {
-            $this->_mLegends[count($this->_mFieldset) - 1] = $legend;
+            /** @var FieldsetElement $element **/
+            $element->set_mLegend($legend);
         }
+        
+        $this->_mFieldset->add($element);
     }
     
     /**
@@ -204,11 +196,12 @@ class FormGenerator implements FormGeneratorObserver{
         $element->addObserver($this);
         $element->setValidations();
         
-        array_push($this->_mElements, $element);
         if(is_a($label, "FormGenerator\FormElements\LabelElement"))
         {
-            $this->_mLabels[count($this->_mElements) - 1] = $label;
+            $element->set_mlabel($label);
         }
+        
+        $this->_mElements->add($element);
     }
     
     /**
@@ -277,34 +270,29 @@ class FormGenerator implements FormGeneratorObserver{
             try{
                 
                 $this->parseConfigFile();
-                $this->loadTemplate($template);
+                $this->setTemplateFile($template);
                 
                 CacheClass::iniCache();
                 $cache_name = CacheClass::expectedCacheName($this->_mId, $this->_mConfigFile,
                                                                 $this->_mTemplateDir . DIRECTORY_SEPARATOR . $this->_mTemplate);
-                $stream = CacheClass::checkCacheFile($cache_name);
+                $cache_exist = CacheClass::checkCacheFile($cache_name);
+                $html = "";
 
-                if($stream === false || $this->_mDebug === true)
+                if($cache_exist === false || $this->_mDebug === true)
                 {
-
-                    $stream = $this->generateHtmlForm();
-
-                    $this->_mformElement->setStream($stream);
-                    $stream = $this->_mformElement->build();
-
-                    $stream .= $this->buildJavaScript();
-
+                    
+                    $html = $this->generateForm();
+                    
                     CacheClass::clearFileCache($this->_mId);
-                    CacheClass::saveDataFile($cache_name, $stream);
+                    CacheClass::saveDataFile($cache_name, $html);
 
                 }
                 else
                 {
-                    $stream = "";
                     include CacheClass::$_cache_path . DIRECTORY_SEPARATOR . $cache_name;
                 }
 
-                return $stream;
+                return $html;
 
             }  
             catch (Exception $e)
@@ -314,7 +302,7 @@ class FormGenerator implements FormGeneratorObserver{
         }
         else
         {
-            throw new \Exception("No configuration data");
+            throw new \Exception("No configuration data", __FILE__);
         }
         
     }
@@ -367,7 +355,7 @@ class FormGenerator implements FormGeneratorObserver{
             }
             else
             {
-                throw new \Exception("Config file not found.");
+                throw new \Exception("Config file not found.", __FILE__);
             }
         }
         else
@@ -462,37 +450,14 @@ class FormGenerator implements FormGeneratorObserver{
      * @param string $template
      * @return void 
      */
-    private function loadTemplate($template = "")
+    private function setTemplateFile($template = "")
     {
-        if(!empty($template))
+        if(empty($template))
         {
-            $this->_mTemplate = $template;
-        }
-        else
-        {
-            $this->_mTemplate = $this->_mFormData["template"];
-        }
-    }
-    
-    /**
-     * Load a return the html template buffer as a string
-     * If a template name is passed to the method, it will check if the
-     * file exists.
-     * If not throws an exception
-     * @return string 
-     */
-    private function getTemplateStream()
-    {
-        if(is_file($this->_mTemplateDir . $this->_mTemplate))
-        {
-            ob_start();
-            include($this->_mTemplateDir . $this->_mTemplate);
-            return ob_get_clean();
-        }
-        else
-        {
-            throw new FormGeneratorException("Error no template file");
-        }
+            $template = $this->_mFormData["template"];
+        } 
+        
+        $this->set_mTemplate($template);
     }
     
     /**
@@ -500,7 +465,7 @@ class FormGenerator implements FormGeneratorObserver{
      * @param string $template
      * @return string 
      */
-    private function generateHtmlForm()
+    private function generateForm()
     {
         if(!empty($this->_mFormData))
         {
@@ -515,9 +480,12 @@ class FormGenerator implements FormGeneratorObserver{
             {
                 $this->getFormElements();
                 $this->getFormFieldsets();
-                $stream = $this->getTemplateStream();
-
-                return $this->placeFormElements($stream);
+                /* @var $templateAdapter Patterns\IFormTemplateAdapter */
+                $templateAdapter = Patterns\TemplateEngineFactory::getTemplateInstance();
+                $templateAdapter->setTemplatePath($this->_mTemplateDir . $this->_mTemplate);
+                $templateAdapter->setFormElements($this->_mformElement, $this->_mElements, $this->_mFieldset);
+                $templateAdapter->addJavaScript($this->buildJavaScript());
+                return $templateAdapter->render();
             }
         }
     }
@@ -609,58 +577,6 @@ class FormGenerator implements FormGeneratorObserver{
     }
     
     /**
-     * Place the fieldset and legends elemets into the html template
-     * @param string $stream
-     * @return string 
-     */
-    private function placeFieldsetElements($stream)
-    {
-        if(!empty($this->_mFieldset))
-        {
-            foreach($this->_mFieldset as $key => $element)
-            {
-                $element->build();
-                $fieldset_parts = $element->getOpenAndCloseTag();
-                
-                $stream = str_replace("{%fieldset-" . $element->get_mId() . "%}", $fieldset_parts[0], $stream);
-                $stream = str_replace("{%/fieldset-" . $element->get_mId() . "%}", $fieldset_parts[1], $stream);
-                
-                if(isset($this->_mLegends[$key]))
-                {
-                    $tag = "{%legend-" . $element->get_mId() . "%}";
-                    $stream = str_replace($tag, $this->_mLegends[$key]->build(), $stream);
-                }
-            }
-        }
-        return $stream;
-    }
-    
-    /**
-     * Place the form and labels elemets into the html template
-     * @param string $stream
-     * @return string 
-     */
-    private function placeFormElements($stream)
-    {
-        $stream = $this->placeFieldsetElements($stream);
-        
-        if(!empty($this->_mElements))
-        {
-            foreach($this->_mElements as $key => $element)
-            {
-                $stream = str_replace("{%" . $element->get_mId() . "%}", $element->build(), $stream);
-                if(isset($this->_mLabels[$key]))
-                {
-                    $tag = "{%label-" . $element->get_mId() . "%}";
-                    $stream = str_replace($tag, $this->_mLabels[$key]->build(), $stream);
-                }
-            }
-        }
-        
-        return $stream;
-    }
-    
-    /**
      * Initialize a FormElement object
      */
     private function iniForm()
@@ -671,7 +587,7 @@ class FormGenerator implements FormGeneratorObserver{
         }
         else
         {
-            throw new FormGeneratorException("Error no form config");
+            throw new FormGeneratorException("Error no form config", __FILE__);
         }
     }
     
