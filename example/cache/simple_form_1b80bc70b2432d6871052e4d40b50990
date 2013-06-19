@@ -53,19 +53,3 @@ Parcial Html FormGenerator Template
 </ul>
 
 </form>
-<script>
-    $(function() {
-
-        options = {
-                    fields: {"name" : {validator : "not_empty", msg : "The name field is mandatory"},
-"password" : {validator : "regExpression:/^[a-zA-Z0-9]{8}$/", msg : "The password field is mandatory and must contain 8 alphanumerics caracters"},
-"email" : {validator : "email", msg : "The email seems invalid"},
-"sex" : {validator : "checked", msg : "The sex field is mandatory"},
-"countrys" : {validator : "selected", msg : "The country is mandatory"}},
-                    title_msg: "Error in fields form",
-                    error_msg: "Some errors were founds"
-                  };
-        $("#form1").validate(options);
-
-    });
-</script>
