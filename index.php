@@ -25,12 +25,14 @@ $nome_pessoal = "";
         <?php
         
         if(isset($_POST['submit'])){
+            unset($_SESSION["ofg"]);
+            $_SESSION["ofg"]=false;
             
-            if(FormGenerator::isValid('simple_form')){
+            if(FormGenerator::isValid('simple_form') === true){
                 echo "submetido com sucesso";
             }else{
                 echo FormGenerator::getFormErrors('simple_form');
-            }            
+            }
             
         }else{
             try {
