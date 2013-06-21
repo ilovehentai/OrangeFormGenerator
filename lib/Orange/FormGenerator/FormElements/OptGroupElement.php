@@ -4,7 +4,7 @@ namespace FormGenerator\FormElements;
 final class OptGroupElement extends BaseElement{
     
     private $_mOption_element_list = array();
-    private $_mLabel;
+    private $_mLabelAttribute;
     
     public function __construct(array $config = array())
     {
@@ -17,9 +17,9 @@ final class OptGroupElement extends BaseElement{
     }
     
     public function build() {
-        if(!empty($this->_mLabel))
+        if(!empty($this->_mLabelAttribute))
         {
-            $this->_mAttributes['label'] = $this->_mLabel;
+            $this->_mAttributes['label'] = $this->_mLabelAttribute;
         }
         $optiongroup = parent::build();
         $options = $this->buildOptionElement();
@@ -52,11 +52,11 @@ final class OptGroupElement extends BaseElement{
         return $str_op;
     }
     
-    public function get_mLabel() {
-        return $this->_mLabel;
+    public function get_mLabelAttribute() {
+        return $this->_mLabelAttribute;
     }
 
-    public function set_mLabel($_mLabel) {
-        $this->_mLabel = $_mLabel;
+    public function set_mLabelAttribute($_mLabelAttribute) {
+        $this->_mLabelAttribute = $_mLabelAttribute;
     }
 }

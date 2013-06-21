@@ -21,7 +21,7 @@ final class SelectElement extends BaseElement{
                 if(is_array($option))
                 {
                     $op_group = new OptGroupElement($option);
-                    $op_group->set_mLabel($key);
+                    $op_group->set_mLabelAttribute($key);
                     $options_str .= $op_group->build();
                 }
                 else
