@@ -3,3 +3,5 @@
 - Por o validation config file num ficheiro de configurações da biblioteca, config path tambem
 - implementar regras de igualdade de valores nas validações
 - Se alterarmos o template a cache nao o vai permitir porque ela so valida o config
+- radio group nao da para indicar qual é que está checked
+- retirar o form da sessão para validar
