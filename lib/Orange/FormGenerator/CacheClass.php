@@ -1,6 +1,7 @@
 <?php
 
 namespace FormGenerator;
+use FormGenerator\FormGeneratorException\FormGeneratorCacheException;
 
 class CacheClass{
     
@@ -32,7 +33,7 @@ class CacheClass{
         {
             if(!mkdir(self::$_cache_path))
             {
-                throw new \Exception("Cache building error");
+                throw new FormGeneratorCacheException("Cache building error");
             }
         }
     }

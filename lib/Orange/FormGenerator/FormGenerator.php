@@ -131,8 +131,6 @@ class FormGenerator implements FormGeneratorObserver{
     }
     
     public function __wakeup() {
-        //Se necessário vai fazer o processamento necessário 
-        //para unserializar o formulário da sessão
         ;
     }
     
@@ -267,42 +265,35 @@ class FormGenerator implements FormGeneratorObserver{
     {
         if(is_file($this->_mConfigFile))
         {
-            try{
                 
-                $this->parseConfigFile();
-                $this->setTemplateFile($template);
-                
-                CacheClass::iniCache();
-                $cache_name = CacheClass::expectedCacheName($this->_mId, $this->_mConfigFile,
-                                                                $this->_mTemplateDir . DIRECTORY_SEPARATOR . $this->_mTemplate);
-                $cache_exist = CacheClass::checkCacheFile($cache_name);
-                $html = "";
+            $this->parseConfigFile();
+            $this->setTemplateFile($template);
 
-                if($cache_exist === false || $this->_mDebug === true)
-                {
-                    
-                    $html = $this->generateForm();
-                    
-                    CacheClass::clearFileCache($this->_mId);
-                    CacheClass::saveDataFile($cache_name, $html);
+            CacheClass::iniCache();
+            $cache_name = CacheClass::expectedCacheName($this->_mId, $this->_mConfigFile,
+                                                            $this->_mTemplateDir . DIRECTORY_SEPARATOR . $this->_mTemplate);
+            $cache_exist = CacheClass::checkCacheFile($cache_name);
+            $html = "";
 
-                }
-                else
-                {
-                    include CacheClass::$_cache_path . DIRECTORY_SEPARATOR . $cache_name;
-                }
-
-                return $html;
-
-            }  
-            catch (Exception $e)
+            if($cache_exist === false || $this->_mDebug === true)
             {
-                echo $e->getTraceAsString();
+
+                $html = $this->generateForm();
+
+                CacheClass::clearFileCache($this->_mId);
+                CacheClass::saveDataFile($cache_name, $html);
+
             }
+            else
+            {
+                include CacheClass::$_cache_path . DIRECTORY_SEPARATOR . $cache_name;
+            }
+
+            return $html;
         }
         else
         {
-            throw new \Exception("No configuration data", __FILE__);
+            throw new FormGeneratorException("No configuration data");
         }
         
     }
@@ -355,7 +346,7 @@ class FormGenerator implements FormGeneratorObserver{
             }
             else
             {
-                throw new \Exception("Config file not found.", __FILE__);
+                throw new FormGeneratorException("Config file not found.");
             }
         }
         else
@@ -587,7 +578,7 @@ class FormGenerator implements FormGeneratorObserver{
         }
         else
         {
-            throw new FormGeneratorException("Error no form config", __FILE__);
+            throw new FormGeneratorException("Error no form config");
         }
     }
     

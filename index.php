@@ -3,7 +3,7 @@ require_once(__DIR__ . DIRECTORY_SEPARATOR . "example" . DIRECTORY_SEPARATOR . "
 use FormGenerator\FormGenerator;
 
 /** Initialize variables **/
-$nome_pessoal = "";
+$nome_pessoal = "My Name (Default Value)";
 ?>
 <!DOCTYPE html>
 <html>
@@ -25,8 +25,6 @@ $nome_pessoal = "";
         <?php
         
         if(isset($_POST['submit'])){
-            unset($_SESSION["ofg"]);
-            $_SESSION["ofg"]=false;
             
             if(FormGenerator::isValid('simple_form') === true){
                 echo "submetido com sucesso";
@@ -48,8 +46,6 @@ $nome_pessoal = "";
                 $form->set_mDebug(true);
                 echo $form->renderDebug();
                 
-            } catch (FormGeneratorException $e) {
-                print_r($e->getTraceAsString());
             } catch (Exception $e) {
                 print_r($e->getTraceAsString());
             }

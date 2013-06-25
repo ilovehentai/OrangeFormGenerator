@@ -41,7 +41,7 @@ class BaseTemplateEngine {
         }
         else
         {
-            throw new FormGeneratorException("Error no template file", __FILE__);
+            throw new FormGeneratorTemplateException("Error no template file");
         }
     }
     

@@ -1,8 +1,16 @@
 <?php
-
 namespace FormGenerator\FormGeneratorException;
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
 
-class FormGeneratorException extends \ErrorException {
+/**
+ * Description of FormGeneratorTemplateException
+ *
+ * @author jose
+ */
+class FormGeneratorTemplateException extends \ErrorException{
     
     public function __construct ($message, $code, $severity, $filename, $lineno, $previous)
     {
