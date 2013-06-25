@@ -40,6 +40,10 @@ final class RadioElement extends InputElement{
                     $label = $label_tmp->build();
                 }
                 
+                if(array_key_exists("checked", $group)){
+                    $attributes['attributes']['checked'] = $group["checked"];
+                }
+                
                 $radio_tmp = new RadioElement($attributes);
                 $list_tmp_radio[] = $label . $radio_tmp->build();
             }

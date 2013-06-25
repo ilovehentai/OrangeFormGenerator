@@ -72,7 +72,7 @@ fields:
     attributes: { name: sex}
     group: 
       - {label: M, value: m, attributes:{class: sex-label}}
-      - {label: F, value: f, attributes:{class: sex-label}}
+      - {label: F, value: f, checked: checked, attributes:{class: sex-label}}
 
   - id: interess
     type: checkbox
@@ -81,7 +81,7 @@ fields:
     attributes: {}
     group: 
       - { label: Sports, value: sports, attributes:{class: group-label}}
-      - { label: Literature, value: l, attributes:{class: group-label}}
+      - { label: Literature, checked: checked, value: l, attributes:{class: group-label}}
 
   - id: countrys
     type: select

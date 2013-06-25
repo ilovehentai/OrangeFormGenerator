@@ -42,6 +42,11 @@ final class CheckboxElement extends InputElement{
                                                 "attributes" => $lattributes));
                     $label = $label_tmp->build();
                 }
+                
+                if(array_key_exists("checked", $group)){
+                    $attributes['attributes']['checked'] = $group["checked"];
+                }
+                
                 $checkbox_tmp = new CheckboxElement($attributes);
                 $list_tmp_checkbox[] = $label . $checkbox_tmp->build();
             }
