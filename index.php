@@ -40,13 +40,16 @@ $nome_pessoal = "My Name (Default Value)";
                                                  "cacheDir" => __DIR__ . "/example/cache/",
                                                  "configFile" => "example.yml",
                                                  "templateDir" => __DIR__ . "/example/configs/",
-                                                 "elements_default_values" => array("nome_pessoal" => $nome_pessoal)
+                                                 "elements_default_values" => array("nome_pessoal" => $nome_pessoal),
+                                                 "readonly" => true
                                                 ));
-                echo $form->render();
                 $form->set_mDebug(true);
+                echo $form->render();
                 echo $form->renderDebug();
                 
             } catch (Exception $e) {
+                echo  $e->getMessage();
+                echo "<br />";
                 print_r($e->getTraceAsString());
             }
         }

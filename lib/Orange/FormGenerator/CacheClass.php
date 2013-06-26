@@ -33,7 +33,7 @@ class CacheClass{
         {
             if(!mkdir(self::$_cache_path))
             {
-                throw new FormGeneratorCacheException("Cache building error");
+                throw new FormGeneratorCacheException("Cache building error no such path: " . self::$_cache_path);
             }
         }
     }

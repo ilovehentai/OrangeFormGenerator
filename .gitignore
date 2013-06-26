@@ -1,5 +1,6 @@
 /lib/Orange/FormGenerator/cache/*
 /example/cache/*
+example/cache/*
 /nbproject/*
 !.gitignore
 

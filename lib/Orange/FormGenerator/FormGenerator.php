@@ -267,6 +267,7 @@ class FormGenerator implements FormGeneratorObserver{
         {
                 
             $this->parseConfigFile();
+            $this->checkConfigsArguments();
             $this->setTemplateFile($template);
 
             CacheClass::iniCache();
@@ -293,7 +294,7 @@ class FormGenerator implements FormGeneratorObserver{
         }
         else
         {
-            throw new FormGeneratorException("No configuration data");
+            throw new FormGeneratorException("No configuration data no such file: " . $this->_mConfigFile);
         }
         
     }
@@ -346,10 +347,10 @@ class FormGenerator implements FormGeneratorObserver{
             }
             else
             {
-                throw new FormGeneratorException("Config file not found.");
+                throw new FormGeneratorException("Config file not found. No such file : " . $this->_mConfigDir . $configFile);
             }
         }
-        else
+        else if ($configFile === "")
         {
             $this->_mConfigFile = FormConfig::getDefaultConfigFile();
         }
@@ -421,9 +422,9 @@ class FormGenerator implements FormGeneratorObserver{
                                  "cacheDir" => "defineCacheDirectory",
                                  "templateDir" => "defineTemplateDirectory",
                                  "elements_default_values" => "defineElementsDefaultsValues",
-                                 "validationFile" => "defineValidationFile"
+                                 "validationFile" => "defineValidationFile",
+                                 "readonly" => "set_mReadOnly"
                                 );
-        
         
         foreach($valid_arguments as $key => $method)
         {
@@ -431,9 +432,34 @@ class FormGenerator implements FormGeneratorObserver{
             {
                 $args[$key] = null;
             }
+            
             $this->$method($args[$key]);
         }
         
+    }
+    
+    private function checkConfigsArguments() {
+        
+        if(isset($this->_mFormData["configs"]) && is_array($this->_mFormData["configs"])) {
+            
+            $root_dir = "";
+            
+            foreach ($this->_mFormData["configs"] as $key => $config) {
+                if(is_string($config)) {
+                    if(strstr($config, "%DIR%")){
+                        $this->_mFormData["configs"][$key] = str_replace("%DIR%", __DIR__, $config);
+                    }
+                    if(strstr($config, "%ROOT%")){
+                        $this->_mFormData["configs"][$key] = str_replace("%ROOT%", $root_dir, $config);
+                    }
+                    if($key == "rootDir") {
+                        $root_dir = $this->_mFormData["configs"][$key];
+                    }
+                }
+            }
+            
+            $this->checkArguments($this->_mFormData["configs"]);
+        }
     }
     
     /**
@@ -517,6 +543,11 @@ class FormGenerator implements FormGeneratorObserver{
                     $label = new LabelElement(array("text" => $label_text,
                                                 "attributes" => $label_attributes)
                                         );
+                }
+                
+                if($this->_mReadOnly) {
+                    $field["attributes"] = array_merge($field["attributes"], 
+                                                        array("readonly" => "readonly", "disabled" => "disabled"));
                 }
                 
                 $this->addElement(ElementFactory::creatElement($field), $label);

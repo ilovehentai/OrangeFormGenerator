@@ -3,6 +3,7 @@
 namespace FormGenerator\Validation;
 
 use Symfony\Component\Yaml\Yaml;
+use \FormGenerator\FormGeneratorException\FormGeneratorException;
 
 class ValidationConfigClass{
     
@@ -24,6 +25,10 @@ class ValidationConfigClass{
         {
             $this->_mValidationConfigFile = $file;
             $this->_mConfig_data = Yaml::parse($file);
+        }
+        else
+        {
+            throw new FormGeneratorException("Validation file not found: " . $file);
         }
     }
     
