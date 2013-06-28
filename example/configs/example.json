@@ -78,7 +78,7 @@
             "type": "radio",
             "validation": [{
                     "rule": "checked",
-                    "message": "The sex field is mandatory" }],
+                    "message": "The sex field is mandatory"}],
             "label": {
                 "text": "Sex"},
             "attributes": {"name": "sex"},
