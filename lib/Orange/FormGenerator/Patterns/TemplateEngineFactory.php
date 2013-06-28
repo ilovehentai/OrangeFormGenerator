@@ -14,11 +14,7 @@ class TemplateEngineFactory {
     //put your code here
     public static function getTemplateInstance()
     {
-        $class_path = \FormGenerator\FormConfig::getDefaultTemplateEngine();
-        if(isset($config['template_engine'])){
-            $class_path = $config['template_engine'];
-        }
-        
+        $class_path = \FormGenerator\FormConfig::getTemplateEngine();
         return new $class_path();
     }
 }

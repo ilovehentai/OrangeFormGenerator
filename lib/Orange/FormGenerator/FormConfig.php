@@ -9,6 +9,7 @@ class FormConfig {
     const OFG_CONFIG_DIR = 'Configs';
     const OFG_DEFAULT_CACHE_DIR = 'cache';
     const OFG_DEFAULT_TEMPLATE_ENGINE_ADAPTER = 'FormGenerator\\FormGeneratorSimpleTemplateEngine\\SimpleTemplateEngineAdapter';
+    const OFG_DEFAULT_PARSER_ADAPTERS_PATH = 'FormGenerator\\FormParser\\';
     
     const OFG_ERROR_NO_SESSION = "Form %s not found in Session";
     const OFG_ERROR_INVALID_FORM_OBJECT = "Invalid Form Object for %s in Session";
@@ -29,8 +30,12 @@ class FormConfig {
         return __DIR__ . DIRECTORY_SEPARATOR . self::OFG_DEFAULT_CACHE_DIR . DIRECTORY_SEPARATOR;
     }
     
-    public static function getDefaultTemplateEngine(){
+    public static function getTemplateEngine(){
         return self::OFG_DEFAULT_TEMPLATE_ENGINE_ADAPTER;
+    }
+    
+    public static function getParserAdapterPath(){
+        return self::OFG_DEFAULT_PARSER_ADAPTERS_PATH;
     }
     
     public static function errorMSGForFormInSession($formId){

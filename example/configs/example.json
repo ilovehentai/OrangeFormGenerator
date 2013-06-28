@@ -1,0 +1,151 @@
+{
+    "template": "example.html",
+    "configs": {
+        "rootDir": "%DIR%/../../..",
+        "configDir": "%ROOT%/example/configs/",
+        "cacheDir": "%ROOT%/example/cache/",
+        "templateDir": "%ROOT%/example/configs/",
+        "elements_default_values": {"nome_pessoal": "My Name (Default Value - Overridden)"},
+        "readonly": true
+    },
+    "form": {
+        "id": "form1",
+        "action": "self",
+        "method": "post",
+        "enctype": "multipart/form-data",
+        "attributes": {"name": "form1", "class": "xpto"}
+    },
+    "fieldset": [
+        {
+            "id": "group1",
+            "legend": {
+                "text": "Personal information",
+                "attributes": {"class": "legend_xpto"}
+            }
+        },
+        {
+            "id": "group2",
+            "legend": {
+                "text": "Extra Information",
+                "attributes": {"class": "xpto"}
+            }
+        }
+    ],
+    "fields": [
+        {
+            "id": "name",
+            "label": "Name",
+            "type": "text",
+            "validation": [
+                {"rule": "not_empty",
+                    "message": "The name field is mandatory"}
+            ],
+            "attributes": {
+                "value": "$nome_pessoal",
+                "maxlength": 100
+            }
+        },
+        {
+            "id": "password",
+            "label": "Password",
+            "type": "password",
+            "validation": [{
+                    "rule": "regExpression:/^[a-zA-Z0-9]{8}$/",
+                    "message": "The password field is mandatory and must contain 8 alphanumerics caracters"
+                }],
+            "attributes": {"name": "password", "value": ""}
+        },
+        {"id": "password_chk",
+            "label": "Confirm Password",
+            "type": "password",
+            "validation": [{
+                    "rule": "password",
+                    "message": "The password and the password confirmation doesn't match"}],
+            "attributes": {"name": "password", "value": ""}},
+        {"id": "email",
+            "label": "Email",
+            "type": "text",
+            "validation": [{
+                    "rule": "email",
+                    "message": "The email seems invalid"}],
+            "attributes": {"name": "email", "value": ""}},
+        {"id": "date",
+            "label": "Birth date",
+            "type": "calendar",
+            "format": "dd-mm-aa",
+            "attributes": {"name": "calendario", "value": "0000-00-00"}},
+        {"id": "sex",
+            "type": "radio",
+            "validation": [{
+                    "rule": "checked",
+                    "message": "The sex field is mandatory" }],
+            "label": {
+                "text": "Sex"},
+            "attributes": {"name": "sex"},
+            "group": [
+                {"label": "M", "value": "m", "attributes": {"class": "sex-label"}},
+                {"label": "F", "value": "f", "checked": "checked", "attributes": {"class": "sex-label"}}]},
+        {"id": "interess",
+            "type": "checkbox",
+            "label": "Interess",
+            "name": "interesses",
+            "attributes": {},
+            "group": [
+                {"label": "Sports", "value": "sports", "attributes": {"class": "group-label"}},
+                {"label": "Literature", "checked": "checked", "value": "l", "attributes": {"class": "group-label"}}]},
+        {"id": "countrys",
+            "type": "select",
+            "validation": [{
+                    "rule": "selected",
+                    "message": "The country is mandatory"}],
+            "label": "Countrys",
+            "attributes": {"name": "countrys"},
+            "options": {"1": "Portugal", "2": "Suisse", "3": "China", "4": "Nippon"}},
+        {"id": "optiongroup",
+            "type": "select",
+            "label": "Option Group",
+            "attributes": {"name": "optiongroup"},
+            "options": {"option1": {"1": "Option 1", "2": "Option 2"}, "option2": {"3": "Option 3", "4": "Option 4"}}},
+        {"id": "observ",
+            "type": "textarea",
+            "maxlength": 300,
+            "label": "Observations",
+            "attributes": {"name": "observ"},
+            "text": "hello world"},
+        {"id": "autorizo",
+            "type": "checkbox",
+            "label": {
+                "text": "Autorizo",
+                "attributes": {"class": "small-label"}
+            },
+            "name": "autorizo",
+            "attributes": {"value": 1}},
+        {"id": "file",
+            "type": "file",
+            "label": "Upload ficheiro",
+            "attributes": {"name": "file", "value": ""}},
+        {"id": "captcha",
+            "type": "captcha",
+            "attributes": {"name": "captcha", "value": ""}},
+        {"id": "hidden",
+            "type": "hidden",
+            "attributes": {"name": "hidden", "value": 1}},
+        {"id": "button",
+            "type": "button",
+            "attributes": {"name": "button", "value": "button"}},
+        {"id": "push",
+            "type": "pushbutton",
+            "attributes": {"name": "pushbutton", "value": "Push Button", "type": "button"}},
+        {"id": "reset",
+            "type": "reset",
+            "attributes": {"name": "reset", "value": "reset"}},
+        {"id": "image",
+            "type": "image",
+            "src": "/images/upload_64.png",
+            "attributes": {"name": "image", "value": "image"}},
+        {"id": "submit",
+            "type": "submit",
+            "attributes": {"name": "submit", "value": "submit"}}
+
+    ]
+}

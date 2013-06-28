@@ -2,7 +2,6 @@
 
 namespace FormGenerator;
 
-use Symfony\Component\Yaml\Yaml;
 use FormGenerator\FormElements\LegendElement;
 use FormGenerator\FormElements\LabelElement;
 use FormGenerator\FormElements\BaseElement;
@@ -10,6 +9,7 @@ use FormGenerator\FormElements\FormElement;
 use FormGenerator\FormElements\FieldsetElement;
 use FormGenerator\Patterns\ElementFactory;
 use FormGenerator\Patterns\FormGeneratorObserver;
+use FormGenerator\FormParser\ParserFactory;
 use FormGenerator\FormGeneratorException\FormGeneratorException;
 use FormGenerator\Validation\ValidationConfigClass;
 use FormGenerator\CacheClass;
@@ -19,13 +19,13 @@ use FormGenerator\Collection;
 class FormGenerator implements FormGeneratorObserver{
     
     /**
-     * Yaml Form configuration File name
+     * array Form configuration File name
      * @var string 
      */
     private $_mConfigFile;
     
     /**
-     * Yaml Form configuration path files
+     * array Form configuration path files
      * @var string 
      */
     private $_mConfigDir;
@@ -37,7 +37,7 @@ class FormGenerator implements FormGeneratorObserver{
     private $_mTemplate;
     
     /**
-     * Yaml parsed to array form data
+     * array parsed to array form data
      * @var array
      */
     private $_mFormData;
@@ -203,12 +203,15 @@ class FormGenerator implements FormGeneratorObserver{
     }
     
     /**
-     * Parse the form configuration yaml file to an array
+     * Parse the form configuration file to an array
      * @return void
      */
     public function parseConfigFile()
     {
-        $this->_mFormData = Yaml::parse($this->_mConfigFile);
+        $file_type = pathinfo($this->_mConfigFile, PATHINFO_EXTENSION);
+        $parser = ParserFactory::getParserInstance($file_type);
+        /* @var $parser FormGenerator\FormParser\IFormParser */
+        $this->_mFormData = $parser::parse($this->_mConfigFile);
     }
     
     /**

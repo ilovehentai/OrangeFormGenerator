@@ -38,7 +38,7 @@ $nome_pessoal = "My Name (Default Value)";
                                             array(
                                                  "configDir" => __DIR__ . "/example/configs/",
                                                  "cacheDir" => __DIR__ . "/example/cache/",
-                                                 "configFile" => "example.yml",
+                                                 "configFile" => "example.json",
                                                  "templateDir" => __DIR__ . "/example/configs/",
                                                  "elements_default_values" => array("nome_pessoal" => $nome_pessoal),
                                                  "readonly" => true
