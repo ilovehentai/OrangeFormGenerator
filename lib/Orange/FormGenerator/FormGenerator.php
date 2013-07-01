@@ -505,7 +505,7 @@ class FormGenerator implements FormGeneratorObserver{
                 $templateAdapter = FormGeneratorSimpleTemplateEngine\TemplateEngineFactory::getTemplateInstance();
                 $templateAdapter->setTemplatePath($this->_mTemplateDir . $this->_mTemplate);
                 $templateAdapter->setFormElements($this->_mformElement, $this->_mElements, $this->_mFieldset);
-                //$templateAdapter->addJavaScript($this->buildJavaScript());
+                $templateAdapter->addJavaScript($this->buildJavaScript());
                 return $templateAdapter->render();
             }
         }

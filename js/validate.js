@@ -5,6 +5,8 @@
         var _this = this;
         var opts = $.extend({}, $.fn.validate.defaults, options);
         
+        var element;
+        
         var masks = 
         {
             "not_empty" : /(.){1,}/,
@@ -15,6 +17,38 @@
             "regExpression" : function(regex){
                 return regex;
             },
+            "different" : function(word){
+                return "[^" + word + "]";
+            },
+            "number" : function(size){
+                var length = "";
+                if(size != null && size != "" && size != "~")
+                {
+                    var minus = size.match(/-[0-9]+/);
+                    var plus = size.match(/\+[0-9]+/);
+                    
+                    if(minus != null)
+                    {
+                        minus = minus.replace("-", "");
+                    }
+                    else if (plus == null)
+                    {
+                        minus = size;
+                    }
+                    
+                    if(plus != null)
+                    {
+                        plus = (minus != null) ? "," : "" + plus.replace("+", "");
+                    }
+                    else
+                    {
+                        plus = "";
+                    }
+                    
+                    length = "{" + minus + plus + "}";
+                }
+                return "[0-9]" + length;
+            },
             "not_null_value" : /[^null]/,
             "nif" : /[0-9]{9}/,
             "zip_code" : /([1-9]{1}[0-9]{3}-[0-9]{3}|[1-9]{1}[0-9]{3})/,
@@ -22,7 +56,51 @@
                 return "(.){" + size + ",}";
             },
             "match" : function(val){
-                return $("#" + val).val();
+                return ($("#" + val).val() != "") ? $("#" + val).val() : "^$";
+            },
+            "calendario" : function(){
+                var data = new Date(element.val());
+                return (data == "Invalid Date") ? false : "(.*)";
+            },
+            "one_or_other" : function(val){
+                
+                var data = val.split(":");
+                if($("#" + data[0]).val() != "")
+                {
+                    return "(.*)";
+                }
+                else
+                {
+                    return eval("this." + data[1]);
+                }
+            },
+            "not_empty_if" : function(val)
+            {
+                var data = val.split(":");
+                if(element.val() == "" || ($("#" + data[0]).val()).match(eval("this." + data[1])))
+                {
+                    return "(.*)";
+                }
+                else
+                {
+                    return false;
+                }
+            },
+            "empty_if_not" : function(val)
+            {
+                var data = val.split(":");
+                if(element.val() == "")
+                {
+                    return "^$";
+                }
+                else if((element.val()).match(eval("this." + data + "()")))
+                {
+                    return "(.*)";
+                }
+                else
+                {
+                    return false;
+                }
             }
             //checked
         };
@@ -45,7 +123,16 @@
                 var string_msg = "";
                 $.each(o.fields, function(key, val) {
 
+                    if(val.incase != undefined)
+                    {
+                        if($("#" + val.incase).is(":checked"))
+                        {
+                            return true;
+                        }
+                    }
+                        
                     key = $("#" + key);
+                    element = key;
                     $.fn.validate.resetMark(key);
                     
                     var value = key.val();
@@ -72,10 +159,16 @@
                                 }
                                 else
                                 {
-                                    regex = masks[val.validator];
+                                    if (typeof(masks[val.validator]) == "function") {
+                                        regex = masks[val.validator]();
+                                    }
+                                    else
+                                    {
+                                        regex = masks[val.validator];
+                                    }
                                 }
                                 
-                                if(!value.match(regex))
+                                if(regex == false || !value.match(regex))
                                 {
                                     valid = false;
                                 }
@@ -84,7 +177,7 @@
                         if(!valid)
                         {
                             $.fn.validate.mark(key);
-                            string_msg += val.msg + "<br/>";
+                            string_msg += " - " + val.msg + "<br/>";
                         }
                     }
                     
@@ -96,9 +189,15 @@
                 
                 if(string_msg != "")
                 {
+                    
                     $.fn.validate.showErrors(string_msg);
                     return false;
-                }
+					
+                } else if (typeof o.afterValidate == "function") {
+				
+					return o.afterValidate();
+					
+				}
                 
                 return true;
            });
@@ -110,6 +209,7 @@
         if($.fn.validate.listOfBorders[obj.attr("id")] != null)
         {
             obj.css("border-color", $.fn.validate.listOfBorders[obj.attr("id")]);
+            obj.parent().removeClass("erro");
         }
         
     }
@@ -118,6 +218,7 @@
     {
         $.fn.validate.listOfBorders[obj.attr("id")] = obj.css("border-color");
         obj.css("border-color", $.fn.validate.defaults.border_color);
+        obj.parent().addClass("erro");
     }
        
     $.fn.validate.showErrors = function(string_msg)
