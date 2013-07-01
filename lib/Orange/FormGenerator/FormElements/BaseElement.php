@@ -3,8 +3,7 @@
 namespace FormGenerator\FormElements;
 
 use FormGenerator\FormGenerator;
-use FormGenerator\Patterns\ValidationFactory;
-use FormGenerator\Patterns\ElementObservable;
+use FormGenerator\Validation\ValidationFactory;
 use FormGenerator\Validation\ValidationConfigClass;
 use FormGenerator\FormElements\LabelElement;
 

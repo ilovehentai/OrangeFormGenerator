@@ -1,6 +1,6 @@
 <?php
 
-namespace FormGenerator\Patterns;
+namespace FormGenerator\FormGenerator;
 use FormGenerator\FormElements\BaseElement;
 
 interface FormGeneratorObserver{

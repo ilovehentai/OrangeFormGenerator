@@ -1,9 +1,10 @@
 <?php
 
-namespace FormGenerator;
+namespace FormGenerator\FormGeneratorCache;
+use FormGenerator\FormGenerator\FormConfig;
 use FormGenerator\FormGeneratorException\FormGeneratorCacheException;
 
-class CacheClass{
+class FormGeneratorCache{
     
     public static $_cache_path;
     

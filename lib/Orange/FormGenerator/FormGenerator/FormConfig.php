@@ -1,13 +1,13 @@
 <?php
 
-namespace FormGenerator;
+namespace FormGenerator\FormGenerator;
 
 class FormConfig {
     
     const OFG_VALIDATION_CONFIG_FILE = 'validators.yml';
     const OFG_CONFIG_FILE = 'example.yml';
     const OFG_CONFIG_DIR = 'Configs';
-    const OFG_DEFAULT_CACHE_DIR = 'cache';
+    const OFG_DEFAULT_CACHE_DIR = 'Cache';
     const OFG_DEFAULT_TEMPLATE_ENGINE_ADAPTER = 'FormGenerator\\FormGeneratorSimpleTemplateEngine\\SimpleTemplateEngineAdapter';
     const OFG_DEFAULT_PARSER_ADAPTERS_PATH = 'FormGenerator\\FormParser\\';
     
@@ -15,7 +15,7 @@ class FormConfig {
     const OFG_ERROR_INVALID_FORM_OBJECT = "Invalid Form Object for %s in Session";
     
     public static function getConfigDir(){
-        return __DIR__ . DIRECTORY_SEPARATOR . self::OFG_CONFIG_DIR . DIRECTORY_SEPARATOR;
+        return __DIR__ . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . self::OFG_CONFIG_DIR . DIRECTORY_SEPARATOR;
     }
     
     public static function getDefaultConfigFile(){

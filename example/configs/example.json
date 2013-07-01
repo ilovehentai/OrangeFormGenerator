@@ -6,7 +6,7 @@
         "cacheDir": "%ROOT%/example/cache/",
         "templateDir": "%ROOT%/example/configs/",
         "elements_default_values": {"nome_pessoal": "My Name (Default Value - Overridden)"},
-        "readonly": true
+        "readonly": false
     },
     "form": {
         "id": "form1",

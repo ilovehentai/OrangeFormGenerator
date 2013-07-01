@@ -1,6 +1,6 @@
 <?php
 
-namespace FormGenerator\Patterns;
+namespace FormGenerator\FormElements;
 use FormGenerator\FormGenerator;
 
 interface ElementObservable

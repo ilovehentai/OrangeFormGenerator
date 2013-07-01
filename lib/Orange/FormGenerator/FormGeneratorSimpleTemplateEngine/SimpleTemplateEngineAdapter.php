@@ -1,7 +1,6 @@
 <?php
 namespace FormGenerator\FormGeneratorSimpleTemplateEngine;
-use FormGenerator\Collection;
-use FormGenerator\Patterns\IFormTemplateAdapter;
+use FormGenerator\FormCollection\Collection;
 use FormGenerator\FormGeneratorSimpleTemplateEngine\SimpleTemplateEngine;
 use FormGenerator\FormElements\FormElement;
 

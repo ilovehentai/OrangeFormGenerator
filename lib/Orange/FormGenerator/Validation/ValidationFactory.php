@@ -1,6 +1,6 @@
 <?php
 
-namespace FormGenerator\Patterns;
+namespace FormGenerator\Validation;
 
 class ValidationFactory{
     

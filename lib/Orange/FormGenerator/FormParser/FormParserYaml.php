@@ -3,11 +3,11 @@ namespace FormGenerator\FormParser;
 use Symfony\Component\Yaml\Yaml;
 
 /**
- * Description of FormGeneratorYaml
+ * Description of FormParserYaml
  *
  * @author josesantos
  */
-class FormGeneratorYaml implements IFormParser{
+class FormParserYaml implements IFormParser{
     
     public static function parse($file) {
         return Yaml::parse($file);

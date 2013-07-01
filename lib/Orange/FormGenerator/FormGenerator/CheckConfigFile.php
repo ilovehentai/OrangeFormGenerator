@@ -1,6 +1,6 @@
 <?php
 
-namespace FormGenerator;
+namespace FormGenerator\FormGenerator;
 
 class CheckConfigFile{
     

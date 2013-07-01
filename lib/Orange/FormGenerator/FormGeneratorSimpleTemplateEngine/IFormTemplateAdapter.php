@@ -1,6 +1,6 @@
 <?php
-namespace FormGenerator\Patterns;
-use FormGenerator\Collection;
+namespace FormGenerator\FormGeneratorSimpleTemplateEngine;
+use FormGenerator\FormCollection\Collection;
 use FormGenerator\FormElements\FormElement;
 /*
  * To change this template, choose Tools | Templates

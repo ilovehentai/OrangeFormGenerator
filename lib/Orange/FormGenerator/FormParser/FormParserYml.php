@@ -2,10 +2,10 @@
 namespace FormGenerator\FormParser;
 
 /**
- * Description of FormGeneratorYML
+ * Description of FormParserYml
  *
  * @author josesantos
  */
-class FormGeneratorYml extends FormGeneratorYaml{
+class FormParserYml extends FormParserYaml{
     //put your code here
 }

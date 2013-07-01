@@ -7,14 +7,15 @@ use FormGenerator\FormElements\LabelElement;
 use FormGenerator\FormElements\BaseElement;
 use FormGenerator\FormElements\FormElement;
 use FormGenerator\FormElements\FieldsetElement;
-use FormGenerator\Patterns\ElementFactory;
-use FormGenerator\Patterns\FormGeneratorObserver;
+use FormGenerator\FormElements\ElementFactory;
+use FormGenerator\FormGenerator\FormGeneratorObserver;
+use FormGenerator\FormGenerator\FormConfig;
+use FormGenerator\FormGenerator\CheckConfigFile;
 use FormGenerator\FormParser\ParserFactory;
 use FormGenerator\FormGeneratorException\FormGeneratorException;
 use FormGenerator\Validation\ValidationConfigClass;
-use FormGenerator\CacheClass;
-use FormGenerator\FormConfig;
-use FormGenerator\Collection;
+use FormGenerator\FormGeneratorCache\FormGeneratorCache;
+use FormGenerator\FormCollection\Collection;
 
 class FormGenerator implements FormGeneratorObserver{
     
@@ -273,10 +274,10 @@ class FormGenerator implements FormGeneratorObserver{
             $this->checkConfigsArguments();
             $this->setTemplateFile($template);
 
-            CacheClass::iniCache();
-            $cache_name = CacheClass::expectedCacheName($this->_mId, $this->_mConfigFile,
+            FormGeneratorCache::iniCache();
+            $cache_name = FormGeneratorCache::expectedCacheName($this->_mId, $this->_mConfigFile,
                                                             $this->_mTemplateDir . DIRECTORY_SEPARATOR . $this->_mTemplate);
-            $cache_exist = CacheClass::checkCacheFile($cache_name);
+            $cache_exist = FormGeneratorCache::checkCacheFile($cache_name);
             $html = "";
 
             if($cache_exist === false || $this->_mDebug === true)
@@ -284,13 +285,13 @@ class FormGenerator implements FormGeneratorObserver{
 
                 $html = $this->generateForm();
 
-                CacheClass::clearFileCache($this->_mId);
-                CacheClass::saveDataFile($cache_name, $html);
+                FormGeneratorCache::clearFileCache($this->_mId);
+                FormGeneratorCache::saveDataFile($cache_name, $html);
 
             }
             else
             {
-                include CacheClass::$_cache_path . DIRECTORY_SEPARATOR . $cache_name;
+                include FormGeneratorCache::$_cache_path . DIRECTORY_SEPARATOR . $cache_name;
             }
 
             return $html;
@@ -365,7 +366,7 @@ class FormGenerator implements FormGeneratorObserver{
      */
     public function defineCacheDirectory($cacheDir = "")
     {
-        CacheClass::setCachePath($cacheDir);
+        FormGeneratorCache::setCachePath($cacheDir);
     }
     
     /**
@@ -501,7 +502,7 @@ class FormGenerator implements FormGeneratorObserver{
                 $this->getFormElements();
                 $this->getFormFieldsets();
                 /* @var $templateAdapter Patterns\IFormTemplateAdapter */
-                $templateAdapter = Patterns\TemplateEngineFactory::getTemplateInstance();
+                $templateAdapter = FormGeneratorSimpleTemplateEngine\TemplateEngineFactory::getTemplateInstance();
                 $templateAdapter->setTemplatePath($this->_mTemplateDir . $this->_mTemplate);
                 $templateAdapter->setFormElements($this->_mformElement, $this->_mElements, $this->_mFieldset);
                 //$templateAdapter->addJavaScript($this->buildJavaScript());

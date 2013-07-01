@@ -3,7 +3,7 @@ namespace FormGenerator\FormGeneratorSimpleTemplateEngine;
 
 use FormGenerator\FormElements\BaseElement;
 use FormGenerator\FormElements\FieldsetElement;
-use FormGenerator\Collection;
+use FormGenerator\FormCollection\Collection;
 use FormGenerator\FormGeneratorException\FormGeneratorException;
 use FormGenerator\FormElements\FormElement;
 /*

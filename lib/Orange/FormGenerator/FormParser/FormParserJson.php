@@ -3,11 +3,11 @@ namespace FormGenerator\FormParser;
 use \FormGenerator\FormGeneratorException\FormGeneratorException;
 
 /**
- * Description of FormGeneratorJson
+ * Description of FormParserJson
  *
  * @author josesantos
  */
-class FormGeneratorJson implements IFormParser{
+class FormParserJson implements IFormParser{
     
     public static function parse($file) {
         if(is_file($file)){
