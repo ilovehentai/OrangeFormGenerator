@@ -222,7 +222,6 @@ class FormGenerator implements FormGeneratorObserver{
     public function buildJavaScript()
     {
         $js_validation_data = ValidationConfigClass::getInstance()->get_mConfig_data();
-        
         if(is_file(__DIR__ . $js_validation_data["js_template"]))
         {
             if(!empty($this->_mListValidators))
@@ -245,8 +244,6 @@ class FormGenerator implements FormGeneratorObserver{
                 
                 return null;
             }
-            
-            
         }
     }
     
@@ -554,9 +551,26 @@ class FormGenerator implements FormGeneratorObserver{
                                                         array("readonly" => "readonly", "disabled" => "disabled"));
                 }
                 
-                $this->addElement(ElementFactory::creatElement($field), $label);
+                //Check First if a element already exists in the form element list. Cannot have duplicates id on the form
+                if(!$this->getElementById($field["id"])) {
+                    $this->addElement(ElementFactory::creatElement($field), $label);
+                }
             }
         }
+    }
+    
+    private function getElementById($id) {
+        $found = false;
+        if($this->_mElements->getIterator()->valid()) {
+            foreach($this->_mElements as $element){
+                /* @var $element BaseElement */
+                if($element->get_mId() === $id) {
+                    $found = true;
+                    break;
+                }
+            }
+        }
+        return $found;
     }
     
     /**

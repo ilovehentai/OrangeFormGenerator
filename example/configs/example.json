@@ -38,6 +38,9 @@
             "type": "text",
             "validation": [
                 {"rule": "not_empty",
+                    "message": "The name field is mandatory"},
+                
+                {"rule": "money",
                     "message": "The name field is mandatory"}
             ],
             "attributes": {
@@ -59,7 +62,7 @@
             "label": "Confirm Password",
             "type": "password",
             "validation": [{
-                    "rule": "password",
+                    "rule": "match:password",
                     "message": "The password and the password confirmation doesn't match"}],
             "attributes": {"name": "password", "value": ""}},
         {"id": "email",
@@ -72,6 +75,9 @@
         {"id": "date",
             "label": "Birth date",
             "type": "calendar",
+            "validation": [{
+                    "rule": "date",
+                    "message": "The Birth date seems invalid"}],
             "format": "dd-mm-aa",
             "attributes": {"name": "calendario", "value": "0000-00-00"}},
         {"id": "sex",

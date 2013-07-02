@@ -52,7 +52,7 @@ fields:
     label: Confirm Password
     type: password
     validation: 
-      - rule: password
+      - rule: match:password
         message: The password and the password confirmation doesn't match
     attributes: { name: password, value: ~}
 
@@ -68,6 +68,9 @@ fields:
     label: Birth date
     type: calendar
     format: dd-mm-aa
+    validation:
+      - rule: date
+        message: The Birth date seems invalid
     attributes: { name: calendario, value: "0000-00-00" }
 
   - id: sex

@@ -22,23 +22,23 @@
             },
             "number" : function(size){
                 var length = "";
-                if(size != null && size != "" && size != "~")
+                if(size !== null && size !== "" && size !== "~")
                 {
                     var minus = size.match(/-[0-9]+/);
                     var plus = size.match(/\+[0-9]+/);
                     
-                    if(minus != null)
+                    if(minus !== null)
                     {
                         minus = minus.replace("-", "");
                     }
-                    else if (plus == null)
+                    else if (plus === null)
                     {
                         minus = size;
                     }
                     
-                    if(plus != null)
+                    if(plus !== null)
                     {
-                        plus = (minus != null) ? "," : "" + plus.replace("+", "");
+                        plus = (minus !== null) ? "," : "" + plus.replace("+", "");
                     }
                     else
                     {
@@ -56,16 +56,16 @@
                 return "(.){" + size + ",}";
             },
             "match" : function(val){
-                return ($("#" + val).val() != "") ? $("#" + val).val() : "^$";
+                return ($("#" + val).val() !== "") ? $("#" + val).val() : "^$";
             },
-            "calendario" : function(){
+            "date" : function(){
                 var data = new Date(element.val());
-                return (data == "Invalid Date") ? false : "(.*)";
+                return (data === "Invalid Date") ? false : "(.*)";
             },
             "one_or_other" : function(val){
                 
                 var data = val.split(":");
-                if($("#" + data[0]).val() != "")
+                if($("#" + data[0]).val() !== "")
                 {
                     return "(.*)";
                 }
@@ -77,7 +77,7 @@
             "not_empty_if" : function(val)
             {
                 var data = val.split(":");
-                if(element.val() == "" || ($("#" + data[0]).val()).match(eval("this." + data[1])))
+                if(element.val() === "" || ($("#" + data[0]).val()).match(eval("this." + data[1])))
                 {
                     return "(.*)";
                 }
@@ -89,7 +89,7 @@
             "empty_if_not" : function(val)
             {
                 var data = val.split(":");
-                if(element.val() == "")
+                if(element.val() === "")
                 {
                     return "^$";
                 }
@@ -123,7 +123,7 @@
                 var string_msg = "";
                 $.each(o.fields, function(key, val) {
 
-                    if(val.incase != undefined)
+                    if(val.incase !== undefined)
                     {
                         if($("#" + val.incase).is(":checked"))
                         {
@@ -159,7 +159,7 @@
                                 }
                                 else
                                 {
-                                    if (typeof(masks[val.validator]) == "function") {
+                                    if (typeof(masks[val.validator]) === "function") {
                                         regex = masks[val.validator]();
                                     }
                                     else
@@ -168,7 +168,7 @@
                                     }
                                 }
                                 
-                                if(regex == false || !value.match(regex))
+                                if(regex === false || !value.match(regex))
                                 {
                                     valid = false;
                                 }
@@ -179,21 +179,21 @@
                             $.fn.validate.mark(key);
                             string_msg += " - " + val.msg + "<br/>";
                         }
-                    }
+                    };
                     
-                    if(value!=undefined)
+                    if(value!==undefined)
                     {
                         check();
                     }
                 });
                 
-                if(string_msg != "")
+                if(string_msg !== "")
                 {
                     
                     $.fn.validate.showErrors(string_msg);
                     return false;
 					
-                } else if (typeof o.afterValidate == "function") {
+                } else if (typeof o.afterValidate === "function") {
 				
 					return o.afterValidate();
 					
@@ -206,20 +206,20 @@
     
     $.fn.validate.resetMark = function(obj)
     {
-        if($.fn.validate.listOfBorders[obj.attr("id")] != null)
+        if($.fn.validate.listOfBorders[obj.attr("id")] !== null)
         {
             obj.css("border-color", $.fn.validate.listOfBorders[obj.attr("id")]);
             obj.parent().removeClass("erro");
         }
         
-    }
+    };
     
     $.fn.validate.mark = function(obj)
     {
         $.fn.validate.listOfBorders[obj.attr("id")] = obj.css("border-color");
         obj.css("border-color", $.fn.validate.defaults.border_color);
         obj.parent().addClass("erro");
-    }
+    };
        
     $.fn.validate.showErrors = function(string_msg)
     {
@@ -240,7 +240,7 @@
                 }
             }
         });
-    }
+    };
     
     $.fn.validate.listOfBorders = new Array();
     
