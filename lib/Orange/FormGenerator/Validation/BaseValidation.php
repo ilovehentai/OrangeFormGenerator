@@ -19,7 +19,6 @@ class BaseValidation implements ValidationInterface{
     }
 
     public function isValid($value) {
-        
         if(!empty($value) && preg_match($this->_mExpression, $value))
         {   
             return true;

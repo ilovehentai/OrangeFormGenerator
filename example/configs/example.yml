@@ -10,7 +10,7 @@ configs:
   cacheDir: %ROOT%/example/cache/
   templateDir: %ROOT%/example/configs/
   elements_default_values: {nome_pessoal: "My Name (Default Value - Overridden)"}
-  readonly: true
+  readonly: false
 
 form:
   id: form1
@@ -46,6 +46,8 @@ fields:
     validation: 
       - rule: regExpression:/^[a-zA-Z0-9]{8}$/
         message: The password field is mandatory and must contain 8 alphanumerics caracters
+      - rule: number:+6-9
+        message: The password field is mandatory and must contain 8 alphanumerics caracters
     attributes: { name: password, value: ~}
 
   - id: password_chk
@@ -73,6 +75,22 @@ fields:
         message: The Birth date seems invalid
     attributes: { name: calendario, value: "0000-00-00" }
 
+  - id: nif
+    label: NIF
+    type: text
+    validation:
+      - rule: nif
+        message: The NIF number seems invalid
+    attributes: {}
+    
+  - id: zip
+    label: ZIP Code
+    type: text
+    validation:
+      - rule: zip_code
+        message: The Zip code seems invalid
+    attributes: { maxlength: 4, style: 'width:30px' }
+    
   - id: sex
     type: radio
     validation: 

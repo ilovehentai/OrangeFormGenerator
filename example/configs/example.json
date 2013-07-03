@@ -80,6 +80,20 @@
                     "message": "The Birth date seems invalid"}],
             "format": "dd-mm-aa",
             "attributes": {"name": "calendario", "value": "0000-00-00"}},
+        {"id": "nif",
+            "label": "NIF",
+            "type": "text",
+            "validation": [{
+                    "rule": "nif",
+                    "message": "The nif number seems invalid"}],
+            "attributes": {}},
+        {"id": "zip",
+            "label": "ZIP Code",
+            "type": "text",
+            "validation": [{
+                    "rule": "zip_code",
+                    "message": "The zip code seems invalid"}],
+            "attributes": {"style" : "width:30px;", "maxlength" : 4}},
         {"id": "sex",
             "type": "radio",
             "validation": [{

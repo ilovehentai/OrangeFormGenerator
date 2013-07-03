@@ -27,29 +27,29 @@
                     var minus = size.match(/-[0-9]+/);
                     var plus = size.match(/\+[0-9]+/);
                     
-                    if(minus !== null)
+                    if(minus !== null && minus.length > 0)
                     {
-                        minus = minus.replace("-", "");
+                        minus = minus[0].replace("-", "");
                     }
                     else if (plus === null)
                     {
                         minus = size;
                     }
                     
-                    if(plus !== null)
+                    if(plus !== null && plus.length > 0)
                     {
-                        plus = (minus !== null) ? "," : "" + plus.replace("+", "");
+                        plus =  plus[0].replace("+", "") + ((minus !== null) ? "," : "");
                     }
                     else
                     {
                         plus = "";
                     }
                     
-                    length = "{" + minus + plus + "}";
+                    length = "{" + plus + minus + "}";
                 }
                 return "[0-9]" + length;
             },
-            "not_null_value" : /[^null]/,
+            "not_null" : /[^null]/,
             "nif" : /[0-9]{9}/,
             "zip_code" : /([1-9]{1}[0-9]{3}-[0-9]{3}|[1-9]{1}[0-9]{3})/,
             "min_size" : function(size){

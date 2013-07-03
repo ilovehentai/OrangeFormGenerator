@@ -21,6 +21,24 @@ rules:
     method: checked
   regExpression:
     class: RegExpressionValidation
+  number:
+    class: NumberValidation
+  not_null:
+    class: NotNullValidation
+  nif:
+    class: NifValidation
+  zip_code:
+    class: ZipCodeValidation
+  min_size:
+    class: MinSizeValidation
+  date:
+    class: DateValidation
+  match:
+    class: MatchValidation
     method: match
     params:
       - string
+  different:
+  one_or_other:
+  not_empty_if:
+  empty_if_not:

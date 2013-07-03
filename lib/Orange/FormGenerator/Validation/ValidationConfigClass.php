@@ -2,7 +2,7 @@
 
 namespace FormGenerator\Validation;
 
-use Symfony\Component\Yaml\Yaml;
+use FormGenerator\FormParser\ParserFactory;
 use \FormGenerator\FormGeneratorException\FormGeneratorException;
 
 class ValidationConfigClass{
@@ -23,8 +23,11 @@ class ValidationConfigClass{
     {
         if(is_file($file))
         {
+            $file_type = pathinfo($file, PATHINFO_EXTENSION);
+            $parser = ParserFactory::getParserInstance($file_type);
+            /* @var $parser FormGenerator\FormParser\IFormParser */
+            $this->_mConfig_data = $parser::parse($file);
             $this->_mValidationConfigFile = $file;
-            $this->_mConfig_data = Yaml::parse($file);
         }
         else
         {
