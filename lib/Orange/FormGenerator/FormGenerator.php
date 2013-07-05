@@ -232,7 +232,7 @@ class FormGenerator implements FormGeneratorObserver{
                     $js_string_option = '"' . $field_id . '": [';
                     $js_validatores = array();
                     foreach($validatores as $fields) {
-                        $js_validatores[] = $seperator . '{"validator" : "' . 
+                        $js_validatores[] = '{"validator" : "' . 
                                                     $fields['rule'] . '", "msg" : "' . 
                                                     $fields['message'] . '"}';
                     }
