@@ -121,9 +121,9 @@
             $(_this).submit(function(){
             
                 var string_msg = "";
-                $.each(o.fields, function(key, val) {
+                $.each(o.fields, function(key, validators) {
 
-                    if(val.incase !== undefined)
+                    if(validators.incase !== undefined)
                     {
                         if($("#" + val.incase).is(":checked"))
                         {
@@ -140,44 +140,51 @@
                     var check = function(){
 
                         var valid = true;
-                        switch(val.validator)
-                        {
-                            case 'checked':
-                                if(!key.is(":checked"))
+                        if(validators.length > 0) {
+                            
+                            for(var i=0; i < validators.length; i++) {
+                                var val = validators[i];
+                                switch(val.validator)
                                 {
-                                    valid = false;
+                                    case 'checked':
+                                        if(!key.is(":checked"))
+                                        {
+                                            valid = false;
+                                        }
+                                        break;
+                                    default:
+                                        var regex = null;
+                                        if(val.validator.indexOf(":") > -1)
+                                        {
+                                            var valreg = (val.validator).substr((val.validator).indexOf(":") + 1, (val.validator).length);
+                                            var validator = (val.validator).substr(0, (val.validator).indexOf(":"));
+
+                                            regex = masks[validator](valreg);
+                                        }
+                                        else
+                                        {
+                                            if (typeof(masks[val.validator]) === "function") {
+                                                regex = masks[val.validator]();
+                                            }
+                                            else
+                                            {
+                                                regex = masks[val.validator];
+                                            }
+                                        }
+
+                                        if(regex === false || !value.match(regex))
+                                        {
+                                            valid = false;
+                                        }
                                 }
-                                break;
-                            default:
-                                regex = null;
-                                if(val.validator.indexOf(":") > -1)
+
+                                if(!valid)
                                 {
-                                    var valreg = (val.validator).substr((val.validator).indexOf(":") + 1, (val.validator).length);
-                                    var validator = (val.validator).substr(0, (val.validator).indexOf(":"));
-                                    
-                                    regex = masks[validator](valreg);
+                                    $.fn.validate.mark(key);
+                                    string_msg += " - " + val.msg + "<br/>";
                                 }
-                                else
-                                {
-                                    if (typeof(masks[val.validator]) === "function") {
-                                        regex = masks[val.validator]();
-                                    }
-                                    else
-                                    {
-                                        regex = masks[val.validator];
-                                    }
-                                }
-                                
-                                if(regex === false || !value.match(regex))
-                                {
-                                    valid = false;
-                                }
-                        }
-                        
-                        if(!valid)
-                        {
-                            $.fn.validate.mark(key);
-                            string_msg += " - " + val.msg + "<br/>";
+
+                            }
                         }
                     };
                     

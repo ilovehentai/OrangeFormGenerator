@@ -227,11 +227,18 @@ class FormGenerator implements FormGeneratorObserver{
             if(!empty($this->_mListValidators))
             {
                 $jsFields = array();
-                foreach($this->_mListValidators as $fields)
+                foreach($this->_mListValidators as $field_id => $validatores)
                 {
-                    $jsFields[] = '"' . $fields['id'] . '" : {validator : "' . 
-                                    $fields['rule'] . '", msg : "' . 
-                                    $fields['message'] . '"}';
+                    $js_string_option = '"' . $field_id . '": [';
+                    $js_validatores = array();
+                    foreach($validatores as $fields) {
+                        $js_validatores[] = $seperator . '{"validator" : "' . 
+                                                    $fields['rule'] . '", "msg" : "' . 
+                                                    $fields['message'] . '"}';
+                    }
+                    $js_string_option .= implode(",", $js_validatores);
+                    $js_string_option .= ']';
+                    $jsFields[] = $js_string_option;
                 }
                 
                 $jsFields = implode(",\n", $jsFields);
@@ -254,7 +261,11 @@ class FormGenerator implements FormGeneratorObserver{
      */
     public function update(BaseElement $sender, $args) {
         $args['id'] = $sender->get_mId();
-        $this->_mListValidators[] = $args;
+        if(!array_key_exists($args["id"], $this->_mListValidators)) {
+            $this->_mListValidators[$args["id"]][] = $args;
+        } else {
+            array_push($this->_mListValidators[$args["id"]], $args);
+        }
     }
     
     /**
@@ -776,7 +787,7 @@ class FormGenerator implements FormGeneratorObserver{
      */
     private function setErrors(array $errors)
     {
-        $this->_mErrorsInForm .= implode("<br/>", $errors);
+        $this->_mErrorsInForm .= implode("<br/>", $errors) . "<br/>";
     }
     
     /**
