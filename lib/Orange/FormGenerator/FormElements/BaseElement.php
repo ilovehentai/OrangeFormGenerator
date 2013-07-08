@@ -6,6 +6,7 @@ use FormGenerator\FormGenerator;
 use FormGenerator\Validation\ValidationFactory;
 use FormGenerator\Validation\ValidationConfigClass;
 use FormGenerator\FormElements\LabelElement;
+use FormGenerator\FormCollection\Collection;
 
 abstract class BaseElement implements InterfaceElement, ElementObservable{
     
@@ -19,6 +20,7 @@ abstract class BaseElement implements InterfaceElement, ElementObservable{
     protected $_mErrors = array();
     protected $_mCheckName = true;
     protected $_mlabel;
+    protected $_mValue;
     
     /**
      * Create a BaseElemet Object, recieve a configuration array containing 
@@ -39,6 +41,7 @@ abstract class BaseElement implements InterfaceElement, ElementObservable{
         
         $this->_mElementData = $config;
         $this->_mErrors = array();
+        $this->_mValidations = new Collection();
     }
     
     /**
@@ -69,7 +72,7 @@ abstract class BaseElement implements InterfaceElement, ElementObservable{
                 if(is_array($class_info) && array_key_exists("class", $class_info))
                 {
                     $vinfo = array_merge($vinfo, $class_info);
-                    $this->_mValidations[] = ValidationFactory::creatElement($vinfo);
+                    $this->_mValidations->add(ValidationFactory::creatElement($vinfo));
                     $this->notify($vinfo);
                 }
             }
@@ -151,15 +154,20 @@ abstract class BaseElement implements InterfaceElement, ElementObservable{
         }
     }
     
-    public function isValid($value)
+    public function isValid(FormGenerator $form = null)
     {
         $this->_mErrors = array();
-        if(!empty($this->_mValidations))
+        if(!$this->_mValidations->isEmpty())
         {
             foreach($this->_mValidations as /* @var $validation BaseValidation */ $validation)
             {
+                if($validation->hasMatch()) {
+                    $matcher = $validation->getMatch_Element();
+                    $value = $form->getElementValue($matcher);
+                    $validation->setMatch_value($value);
+                }
                 
-                if(!$validation->isValid($value))
+                if(!$validation->isValid($this->_mValue))
                 {
                     $this->_mErrors[] = $validation->get_mErrorMessage();
                 }
@@ -209,6 +217,14 @@ abstract class BaseElement implements InterfaceElement, ElementObservable{
 
     public function set_mlabel(LabelElement $_mlabel) {
         $this->_mlabel = $_mlabel;
+    }
+    
+    public function get_mValue() {
+        return $this->_mValue;
+    }
+
+    public function set_mValue($_mValue) {
+        $this->_mValue = $_mValue;
     }
     
 }

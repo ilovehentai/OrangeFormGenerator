@@ -419,6 +419,20 @@ class FormGenerator implements FormGeneratorObserver{
         }
     }
     
+    public function getElementValue($element_id) {
+        $value = false;
+        if(!$this->_mElements->isEmpty()) {
+            foreach($this->_mElements as /* @var $element BaseElement */ $element) {
+                if($element->get_mId() === $element_id) {
+                    $value = $element->get_mValue();
+                    break;
+                }
+            }
+        }
+        
+        return $value;
+    }
+    
     
     /** Private Methods **/
     
@@ -513,7 +527,7 @@ class FormGenerator implements FormGeneratorObserver{
                 $templateAdapter = FormGeneratorSimpleTemplateEngine\TemplateEngineFactory::getTemplateInstance();
                 $templateAdapter->setTemplatePath($this->_mTemplateDir . $this->_mTemplate);
                 $templateAdapter->setFormElements($this->_mformElement, $this->_mElements, $this->_mFieldset);
-                $templateAdapter->addJavaScript($this->buildJavaScript());
+                //$templateAdapter->addJavaScript($this->buildJavaScript());
                 return $templateAdapter->render();
             }
         }
@@ -755,17 +769,18 @@ class FormGenerator implements FormGeneratorObserver{
                     
                     if($submited_data){
                         
-                        foreach($formObj->get_mElements() as $element)
+                        foreach($formObj->_mElements as $element)
                         {
                             /* @var $element BaseElement */
-                            if(get_class($element) == "FormGenerator\FormElements\FileElement")
+                            if(is_a($element,"FormGenerator\FormElements\FileElement"))
                             {
                                 $submited_data[$element->get_mName()] = $_FILES[$element->get_mName()]["name"];
                             }
                             
                             $element_value = (array_key_exists($element->get_mName(), $submited_data)) ? 
                                                                     $submited_data[$element->get_mName()] : null;
-                            if(!$element->isValid($element_value)) {
+                            $element->set_mValue($element_value);
+                            if(!$element->isValid($formObj)) {
                                 $formObj->setErrors($element->get_mErrors());
                                 $check_form = false;
                             }	

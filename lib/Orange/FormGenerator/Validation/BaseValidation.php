@@ -7,6 +7,7 @@ class BaseValidation implements ValidationInterface{
     protected $_mFormID;
     protected $_mTitleMsg;
     protected $_mErrorMsg;
+    protected $_hasMatch = false;
     
     protected $_mExpression;
     protected $_mErrorMessage;
@@ -41,5 +42,13 @@ class BaseValidation implements ValidationInterface{
     
     public function get_mErrorMessage() {
         return $this->_mErrorMessage;
+    }
+    
+    public function hasMatch() {
+        return $this->_hasMatch;
+    }
+
+    public function set_hasMatch($_hasMatch) {
+        $this->_hasMatch = $_hasMatch;
     }
 }

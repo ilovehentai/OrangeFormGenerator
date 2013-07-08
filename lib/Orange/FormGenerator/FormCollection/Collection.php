@@ -23,4 +23,8 @@ class Collection implements \IteratorAggregate
     public function add($value) {
         $this->_items[$this->_count++] = $value;
     }
+    
+    public function isEmpty() {
+        return $this->_count == 0 ? true : false;
+    }
 }

@@ -46,8 +46,6 @@ fields:
     validation: 
       - rule: regExpression:/^[a-zA-Z0-9]{8}$/
         message: The password field is mandatory and must contain 8 alphanumerics caracters
-      - rule: number:+6-9
-        message: The password length must be bigger then 6 alphanumerics caracters and lower than 9
     attributes: { name: password, value: ~}
 
   - id: password_chk
@@ -55,7 +53,7 @@ fields:
     type: password
     validation: 
       - rule: match:password
-        message: The password and the password confirmation doesn't match
+        message: The password and the password confirmation don't match
     attributes: { name: password, value: ~}
 
   - id: email
