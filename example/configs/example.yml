@@ -77,7 +77,7 @@ fields:
     label: NIF
     type: text
     validation:
-      - rule: nif
+      - rule: not_empty_if:nif
         message: The NIF number seems invalid
     attributes: {}
     

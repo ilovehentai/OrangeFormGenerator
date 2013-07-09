@@ -35,10 +35,11 @@ rules:
     class: DateValidation
   match:
     class: MatchValidation
-    method: match
-    params:
-      - string
   different:
-  one_or_other:
+    class: DifferentValidation
   not_empty_if:
+    class: NotEmptyIfValidation
   empty_if_not:
+    class: EmptyIfNotValidation
+  one_or_other:
+    class: OneOrOtherValidation
