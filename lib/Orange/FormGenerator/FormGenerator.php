@@ -766,9 +766,9 @@ class FormGenerator implements FormGeneratorObserver{
      */
     public static function isValid($formId)
     {
-        $check_form = self::lookForFormData($formId);
+        $check_form = false;
         
-        if(!empty($formId) && $check_form === true)
+        if(!empty($formId))
         {
             // cleans previous errors
             self::clearErrors($formId);
@@ -781,7 +781,7 @@ class FormGenerator implements FormGeneratorObserver{
                     $submited_data = $_SERVER["REQUEST_METHOD"] == "POST" ? $_POST : $_GET;
                     
                     if($submited_data){
-                        
+                        $check_form = true;
                         foreach($formObj->_mElements as $element)
                         {
                             /* @var $element BaseElement */
@@ -802,10 +802,13 @@ class FormGenerator implements FormGeneratorObserver{
                     }
                 }
                 $formObj->save();
+            } else {
+                throw new FormGeneratorException("Invalid Form Data for Form ID: $formId");
             }
         } else {
-            
+            throw new FormGeneratorException("Invalid Form ID: empty");
         }
+        
         return $check_form;
     }
     
@@ -836,27 +839,6 @@ class FormGenerator implements FormGeneratorObserver{
         /* @var $form_data_saver_adapter IFormDataSaver */
         $form_data_saver_adapter = FormDataSaverFactory::getFormDataSaverInstance($formId);
         return $form_data_saver_adapter::getFormData();
-    }
-    
-    public static function lookForFormData($formId){
-        
-        $valid = true;
-        
-        if (!isset($_SESSION["ofg"][$formId])) {
-            $valid = FormConfig::errorMSGForFormInSession($formId);
-        }
-        
-        if (isset($_SESSION["ofg"][$formId]["object"])){ 
-            $formData = self::getFormData($formId);
-            if(!is_a($formData, "FormGenerator\FormGenerator")){
-                $valid = FormConfig::errorMSGForFormObjectInSession($formId);
-            }
-        } else {
-            $valid = FormConfig::errorMSGForFormInSession($formId);
-        }
-        
-        return $valid;
-        
     }
     
     /**
@@ -907,15 +889,11 @@ class FormGenerator implements FormGeneratorObserver{
      */
     public static function getFormErrors($formId)
     {
-        $result = self::lookForFormData($formId);
-        if($result === true) {
-            $form = self::getFormData($formId);
-            $result = false;
-            if(is_a($form, "FormGenerator\FormGenerator")) {
-                $result = $form->get_mErrorsInForm();
-            }
+        $form = self::getFormData($formId);
+        if(is_a($form, "FormGenerator\FormGenerator")) {
+            return $form->get_mErrorsInForm();
         }
-        return $result;
+        return false;
     }
 
 }
