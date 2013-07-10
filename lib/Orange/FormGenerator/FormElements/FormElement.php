@@ -13,12 +13,17 @@ class FormElement extends BaseElement{
 
     protected $_mSkeleton;
     protected $_mAttributes;
+    
+    protected $_csrfToken;
         
-    public function __construct(array $config) {
+    public function __construct(array $config, CsrfTokenElement $csrf_token = null) {
         
-        $this->_mSkeleton = "<form%s>\nstream\n</form>\n";
+        $this->_mSkeleton = "<form%s>\nstream\n{{csrf_token}}\n</form>\n";
         $this->_mAttributes = $config['attributes'];
         $this->_formData = $config;
+        if(!is_null($csrf_token)) {
+            $this->_csrfToken = $csrf_token;
+        }
     }
     
     private function processFormAttributes(array $data)
@@ -47,8 +52,16 @@ class FormElement extends BaseElement{
         {
             $this->_mAttributes = $attr;
         }
+        $this->buildAndaddCsrfToken();
         $html_data = parent::build();
         return str_replace("stream", $this->_stream, $html_data);
+    }
+    
+    private function buildAndaddCsrfToken() {
+        if(!is_null($this->_csrfToken)) {
+            $token = $this->_csrfToken->build();
+            $this->_mSkeleton = str_replace("{{csrf_token}}", $token, $this->_mSkeleton);
+        }
     }
     
     public function get_mAction() {

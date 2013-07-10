@@ -8,6 +8,7 @@ class FormConfig {
     const OFG_CONFIG_FILE = 'example.yml';
     const OFG_CONFIG_DIR = 'Configs';
     const OFG_DEFAULT_CACHE_DIR = 'Cache';
+    const OFG_DEFAULT_FORM_DATA_SAVER_ADAPTER = 'FormGenerator\\FormDataSaver\\SessionFormSaverAdapter';
     const OFG_DEFAULT_TEMPLATE_ENGINE_ADAPTER = 'FormGenerator\\FormGeneratorSimpleTemplateEngine\\SimpleTemplateEngineAdapter';
     const OFG_DEFAULT_PARSER_ADAPTERS_PATH = 'FormGenerator\\FormParser\\';
     
@@ -44,6 +45,10 @@ class FormConfig {
     
     public static function errorMSGForFormObjectInSession($formId){
         return sprintf(self::OFG_ERROR_INVALID_FORM_OBJECT, $formId);
+    }
+    
+    public static function getFormDataSaverAdapter() {
+        return self::OFG_DEFAULT_FORM_DATA_SAVER_ADAPTER;
     }
 }
 

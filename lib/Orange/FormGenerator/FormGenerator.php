@@ -16,9 +16,15 @@ use FormGenerator\FormGeneratorException\FormGeneratorException;
 use FormGenerator\Validation\ValidationConfigClass;
 use FormGenerator\FormGeneratorCache\FormGeneratorCache;
 use FormGenerator\FormCollection\Collection;
+use FormGenerator\FormDataSaver\FormDataSaverFactory;
 
 class FormGenerator implements FormGeneratorObserver{
     
+    /**
+     * The Form unique Id name
+     * @var string
+     */
+    private $_mId;
     /**
      * array Form configuration File name
      * @var string 
@@ -98,6 +104,12 @@ class FormGenerator implements FormGeneratorObserver{
     private $_mTemplateDir = "";
     
     /**
+     * Data Saver Instance
+     * @var IFormDataSaver
+     */
+    private $_mDataSaver;
+    
+    /**
      * List of defaults values for elements
      * @var array 
      */
@@ -119,6 +131,7 @@ class FormGenerator implements FormGeneratorObserver{
         $this->checkArguments($args);
         $this->_mElements = new Collection();
         $this->_mFieldset = new Collection();
+        $this->_mDataSaver = FormDataSaverFactory::getFormDataSaverInstance($idform);
     }
         
     /**
@@ -128,7 +141,7 @@ class FormGenerator implements FormGeneratorObserver{
      */
     public function __sleep() {
         //Save only important info
-        return array("_mId", "_mErrorsInForm", "_mElements", "_mListValidators", "_mReadOnly");
+        return array("_mId", "_mErrorsInForm", "_mElements", "_mListValidators", "_mReadOnly", "_mDataSaver");
     }
     
     public function __wakeup() {
@@ -636,9 +649,8 @@ class FormGenerator implements FormGeneratorObserver{
      */
     private function save()
     {
-        if(session_id() != ""){
-            $_SESSION["ofg"][$this->_mId]["object"] = serialize($this);
-        }
+        /* @var $_mDataSaver IFormDataSaver */
+        $this->_mDataSaver->save($this);
     }
     
     /**
@@ -648,7 +660,8 @@ class FormGenerator implements FormGeneratorObserver{
     {
         if(isset($this->_mFormData['form']) && is_array($this->_mFormData['form']))
         {
-            $this->_mformElement = new FormElement($this->_mFormData['form']);
+            $csrf = ElementFactory::creatElement(array("type" => "CsrfToken", "id" => $this->_mId . "_csrf_token"));
+            $this->_mformElement = new FormElement($this->_mFormData['form'], $csrf);
         }
         else
         {
@@ -820,7 +833,9 @@ class FormGenerator implements FormGeneratorObserver{
      */
     private static function getFormData($formId)
     {
-        return unserialize($_SESSION["ofg"][$formId]["object"]);
+        /* @var $form_data_saver_adapter IFormDataSaver */
+        $form_data_saver_adapter = FormDataSaverFactory::getFormDataSaverInstance($formId);
+        return $form_data_saver_adapter::getFormData();
     }
     
     public static function lookForFormData($formId){
@@ -832,7 +847,7 @@ class FormGenerator implements FormGeneratorObserver{
         }
         
         if (isset($_SESSION["ofg"][$formId]["object"])){ 
-            $formData = unserialize($_SESSION["ofg"][$formId]["object"]);
+            $formData = self::getFormData($formId);
             if(!is_a($formData, "FormGenerator\FormGenerator")){
                 $valid = FormConfig::errorMSGForFormObjectInSession($formId);
             }
@@ -887,15 +902,18 @@ class FormGenerator implements FormGeneratorObserver{
     }
     
     /**
-     * Clear erros in session for formId
+     * Get erros in session for formId
      * @param string $formId 
      */
     public static function getFormErrors($formId)
     {
-        $form = self::getFormData($formId);
-        $result = false;
-        if(is_a($form, "FormGenerator\FormGenerator")) {
-            $result = $form->get_mErrorsInForm();
+        $result = self::lookForFormData($formId);
+        if($result === true) {
+            $form = self::getFormData($formId);
+            $result = false;
+            if(is_a($form, "FormGenerator\FormGenerator")) {
+                $result = $form->get_mErrorsInForm();
+            }
         }
         return $result;
     }
