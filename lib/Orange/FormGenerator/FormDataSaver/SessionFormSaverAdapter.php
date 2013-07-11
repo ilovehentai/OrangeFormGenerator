@@ -36,18 +36,16 @@ class SessionFormSaverAdapter implements IFormDataSaver {
 
     private function setSessionNameSpace() {
         if (session_id() != "") {
-            if (isset($_SESSION["ofg"][$this->_mFormId])) {
+            if (!isset($_SESSION["ofg"][$this->_mFormId])) {
                 $_SESSION["ofg"][$this->_mFormId] = array();
-            } else {
-                throw new FormGeneratorException("This Session Namespace is in use!");
-            }
+            } 
         } else {
             throw new FormGeneratorException("Session have not been started!");
         }
     }
 
     public static function getInstance($formId = "") {
-        return (!self::$_instance) ? self::$_instance = new SessionFormSaver($formId) : self::$_instance;
+        return (!self::$_instance) ? self::$_instance = new SessionFormSaverAdapter($formId) : self::$_instance;
     }
 
     public static function getFormData($formId) {

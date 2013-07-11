@@ -838,7 +838,7 @@ class FormGenerator implements FormGeneratorObserver{
     {
         /* @var $form_data_saver_adapter IFormDataSaver */
         $form_data_saver_adapter = FormDataSaverFactory::getFormDataSaverInstance($formId);
-        return $form_data_saver_adapter::getFormData();
+        return $form_data_saver_adapter::getFormData($formId);
     }
     
     /**

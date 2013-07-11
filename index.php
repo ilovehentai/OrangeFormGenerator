@@ -30,6 +30,7 @@ $nome_pessoal = "My Name (Default Value)";
                 echo "submetido com sucesso";
             }else{
                 echo FormGenerator::getFormErrors('simple_form');
+                echo "<a href=\"/\">Back to form</a>";
             }
             
         }else{
