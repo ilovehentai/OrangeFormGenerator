@@ -62,6 +62,12 @@ class FormGenerator implements FormGeneratorObserver{
     private $_mDebug = false;
     
     /**
+     * If the form is on render debug text mode
+     * @var boolean
+     */
+    private $_mRender_debug = false;
+    
+    /**
      * Form submit error message returned by the validators
      * @var string
      */
@@ -110,6 +116,12 @@ class FormGenerator implements FormGeneratorObserver{
     private $_mDataSaver;
     
     /**
+     * Activate CSRF Token
+     * @var boolean 
+     */
+    private $_isCSRFToken = true;
+    
+    /**
      * List of defaults values for elements
      * @var array 
      */
@@ -141,7 +153,8 @@ class FormGenerator implements FormGeneratorObserver{
      */
     public function __sleep() {
         //Save only important info
-        return array("_mId", "_mErrorsInForm", "_mElements", "_mListValidators", "_mReadOnly", "_mDataSaver");
+        return array("_mId", "_mErrorsInForm", "_mElements", "_mListValidators", 
+                                        "_mReadOnly", "_mDataSaver", "_isCSRFToken");
     }
     
     public function __wakeup() {
@@ -331,12 +344,15 @@ class FormGenerator implements FormGeneratorObserver{
      */
     public function renderDebug($template = "")
     {
+        $this->_mRender_debug = true;
         $stream = $this->render($template);
         $html = str_replace(array("<", ">"), array("&lt;", "&gt;"), $stream);
         $text_area = new FormElements\TextareaElement(
                             array("text" => $html, 
                                   "attributes" => array("style" => "width:100%;height:800px"))
                     );
+        
+        $this->_mRender_debug = false;
         return $text_area->build();
     }
     
@@ -432,20 +448,6 @@ class FormGenerator implements FormGeneratorObserver{
         }
     }
     
-    public function getElementValue($element_id) {
-        $value = false;
-        if(!$this->_mElements->isEmpty()) {
-            foreach($this->_mElements as /* @var $element BaseElement */ $element) {
-                if($element->get_mId() === $element_id) {
-                    $value = $element->get_mValue();
-                    break;
-                }
-            }
-        }
-        
-        return $value;
-    }
-    
     
     /** Private Methods **/
     
@@ -462,11 +464,13 @@ class FormGenerator implements FormGeneratorObserver{
                                  "templateDir" => "defineTemplateDirectory",
                                  "elements_default_values" => "defineElementsDefaultsValues",
                                  "validationFile" => "defineValidationFile",
-                                 "readonly" => "set_mReadOnly"
+                                 "readonly" => "set_mReadOnly",
+                                 "use_csrf_token" => "set_isCSRFToken"
                                 );
         
         foreach($valid_arguments as $key => $method)
         {
+            
             if(!array_key_exists($key, $args))
             {
                 $args[$key] = null;
@@ -590,25 +594,47 @@ class FormGenerator implements FormGeneratorObserver{
                 }
                 
                 //Check First if a element already exists in the form element list. Cannot have duplicates id on the form
-                if(!$this->getElementById($field["id"])) {
+                if(!$this->isElementById($field["id"])) {
                     $this->addElement(ElementFactory::creatElement($field), $label);
                 }
             }
         }
     }
     
-    private function getElementById($id) {
+    private function isElementById($id) {
         $found = false;
         if($this->_mElements->getIterator()->valid()) {
-            foreach($this->_mElements as $element){
+            foreach($this->_mElements as $key => $element){
                 /* @var $element BaseElement */
                 if($element->get_mId() === $id) {
-                    $found = true;
+                    $found = $key;
                     break;
                 }
             }
         }
         return $found;
+    }
+    
+    private function getElementById($id) {
+        $pos = $this->isElementById($id);
+        if($pos !== false) {
+            return $this->_mElements->get($pos);
+        }
+        return false;
+    }
+    
+    public function getElementValue($element_id) {
+        $value = false;
+        if(!$this->_mElements->isEmpty()) {
+            foreach($this->_mElements as /* @var $element BaseElement */ $element) {
+                if($element->get_mId() === $element_id) {
+                    $value = $element->get_mValue();
+                    break;
+                }
+            }
+        }
+        
+        return $value;
     }
     
     /**
@@ -661,6 +687,11 @@ class FormGenerator implements FormGeneratorObserver{
         if(isset($this->_mFormData['form']) && is_array($this->_mFormData['form']))
         {
             $csrf = ElementFactory::creatElement(array("type" => "CsrfToken", "id" => $this->_mId . "_csrf_token"));
+            $this->addElement($csrf);
+            if($this->get_isCSRFToken()) {
+                $csrf->saveCSRFToken($this->_mId);
+            }
+            
             $this->_mformElement = new FormElement($this->_mFormData['form'], $csrf);
         }
         else
@@ -700,7 +731,9 @@ class FormGenerator implements FormGeneratorObserver{
      * @param boolean $_mReadOnly 
      */
     public function set_mReadOnly($_mReadOnly) {
-        $this->_mReadOnly = $_mReadOnly;
+        if(is_bool($_mReadOnly)) {
+            $this->_mReadOnly = $_mReadOnly;
+        }
     }
 
     /**
@@ -758,6 +791,65 @@ class FormGenerator implements FormGeneratorObserver{
     public function set_mErrorsInForm($_mErrorsInForm) {
         $this->_mErrorsInForm = $_mErrorsInForm;
     }
+    
+    /**
+     * Set the form error message
+     * @param string $errors
+     */
+    private function setErrors(array $errors)
+    {
+        $this->_mErrorsInForm .= implode("<br/>", $errors) . "<br/>";
+    }
+    
+    /**
+     * Get the form error message
+     * @return type 
+     */
+    public function get_mErrorsInForm() {
+        return $this->_mErrorsInForm;
+    }
+    
+    /**
+     * Is CSRF Token active in form
+     * @return boolean
+     */
+    public function get_isCSRFToken() {
+        return ($this->_mRender_debug) ? false : $this->_isCSRFToken;
+    }
+
+    /**
+     * Set CSRF Token active in form
+     * @param type $_isCSRFToken
+     */
+    public function set_isCSRFToken($_isCSRFToken) {
+        if(is_bool($_isCSRFToken)) {
+            $this->_isCSRFToken = $_isCSRFToken;
+        }
+    }
+        
+    
+    /**
+     * Internal function to chek is the submited CSRF Token is valid
+     * @param \FormGenerator\FormGenerator $formObj
+     * @param string $formId
+     * @param array $submited_data
+     * @return boolean
+     */
+    private function isValidCsrfToken(FormGenerator $formObj, $formId, array $submited_data) {
+        if($this->get_isCSRFToken()) {
+            $csrf_token = $formObj->getElementById($formId . "_csrf_token");
+            $csrf_tokern_value = (array_key_exists($csrf_token->get_mName(), $submited_data)) ? 
+                                                        $submited_data[$csrf_token->get_mName()] : null;
+            $csrf_token->set_mValue($csrf_tokern_value);
+            
+            if($csrf_token->getCSRFToken($formId) != $csrf_token->get_mValue()) {
+                $formObj->setErrors(array("Invalid Csrf Token"));
+                $formObj->save();
+                return false;
+            }
+        }
+        return true;
+    }
         
     /** Static methods **/
     
@@ -781,6 +873,11 @@ class FormGenerator implements FormGeneratorObserver{
                     $submited_data = $_SERVER["REQUEST_METHOD"] == "POST" ? $_POST : $_GET;
                     
                     if($submited_data){
+                        
+                        if(!$formObj->isValidCsrfToken($formObj, $formId, $submited_data)) {
+                            return false;
+                        }
+                        
                         $check_form = true;
                         foreach($formObj->_mElements as $element)
                         {
@@ -810,23 +907,6 @@ class FormGenerator implements FormGeneratorObserver{
         }
         
         return $check_form;
-    }
-    
-    /**
-     * Set the form error message
-     * @param string $errors
-     */
-    private function setErrors(array $errors)
-    {
-        $this->_mErrorsInForm .= implode("<br/>", $errors) . "<br/>";
-    }
-    
-    /**
-     * Get the form error message
-     * @return type 
-     */
-    public function get_mErrorsInForm() {
-        return $this->_mErrorsInForm;
     }
     
     /**

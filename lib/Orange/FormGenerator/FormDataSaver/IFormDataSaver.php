@@ -13,6 +13,8 @@ interface IFormDataSaver {
     public function getData();    
     public static function isFormNameSpace($formId);
     public static function getFormData($formId);
+    public static function addItem($formId, $index, $item);
+    public static function getItem($formId, $index);
 }
 
 ?>

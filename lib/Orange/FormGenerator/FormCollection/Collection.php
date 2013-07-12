@@ -27,4 +27,8 @@ class Collection implements \IteratorAggregate
     public function isEmpty() {
         return $this->_count == 0 ? true : false;
     }
+    
+    public function get($index) {
+        return $this->_items[$index];
+    }
 }

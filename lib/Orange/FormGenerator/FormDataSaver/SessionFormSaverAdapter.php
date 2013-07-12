@@ -4,7 +4,6 @@ namespace FormGenerator\FormDataSaver;
 
 use FormGenerator\FormGenerator;
 use FormGenerator\FormGeneratorException\FormGeneratorException;
-
 /**
  * Description of SessionFormSaver
  *
@@ -68,7 +67,15 @@ class SessionFormSaverAdapter implements IFormDataSaver {
 
         return $valid;
     }
+    
+    public static function addItem($formId, $index, $item) {
+        $_SESSION["ofg"][$formId][$index] = $item;
+    }
 
+    public static function getItem($formId, $index) {
+        return $_SESSION["ofg"][$formId][$index];
+    }
+    
 }
 
 ?>
