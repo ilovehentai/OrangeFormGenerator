@@ -68,12 +68,6 @@ class FormGenerator implements FormGeneratorObserver{
     private $_mRender_debug = false;
     
     /**
-     * Form submit error message returned by the validators
-     * @var string
-     */
-    private $_mError;
-    
-    /**
      * List of BaseElement Objects
      * @var Collection 
      */
@@ -102,6 +96,13 @@ class FormGenerator implements FormGeneratorObserver{
      * @var string 
      */
     private $_mErrorsInForm = "";
+    
+    
+    /**
+     * Form submit Collection messages error returned by the validators
+     * @var Collection
+     */
+    private $_mErrors;
     
     /**
      * Template form directory path
@@ -143,6 +144,7 @@ class FormGenerator implements FormGeneratorObserver{
         $this->checkArguments($args);
         $this->_mElements = new Collection();
         $this->_mFieldset = new Collection();
+        $this->_mErrors = new Collection();
         $this->_mDataSaver = FormDataSaverFactory::getFormDataSaverInstance($idform);
     }
         
@@ -153,7 +155,7 @@ class FormGenerator implements FormGeneratorObserver{
      */
     public function __sleep() {
         //Save only important info
-        return array("_mId", "_mErrorsInForm", "_mElements", "_mListValidators", 
+        return array("_mId", "_mErrors", "_mElements", "_mListValidators", 
                                         "_mReadOnly", "_mDataSaver", "_isCSRFToken");
     }
     
@@ -227,6 +229,12 @@ class FormGenerator implements FormGeneratorObserver{
         }
         
         $this->_mElements->add($element);
+    }
+    
+    
+    
+    public function addElementErrors(array $errors) {
+        $this->_mErrors->add($errors);
     }
     
     /**
@@ -448,6 +456,20 @@ class FormGenerator implements FormGeneratorObserver{
         }
     }
     
+    public function getElementValue($element_id) {
+        $value = false;
+        if(!$this->_mElements->isEmpty()) {
+            foreach($this->_mElements as /* @var $element BaseElement */ $element) {
+                if($element->get_mId() === $element_id) {
+                    $value = $element->get_mValue();
+                    break;
+                }
+            }
+        }
+        
+        return $value;
+    }
+    
     
     /** Private Methods **/
     
@@ -623,20 +645,6 @@ class FormGenerator implements FormGeneratorObserver{
         return false;
     }
     
-    public function getElementValue($element_id) {
-        $value = false;
-        if(!$this->_mElements->isEmpty()) {
-            foreach($this->_mElements as /* @var $element BaseElement */ $element) {
-                if($element->get_mId() === $element_id) {
-                    $value = $element->get_mValue();
-                    break;
-                }
-            }
-        }
-        
-        return $value;
-    }
-    
     /**
      * Fill the FieldsetElement List with FieldsetElement Objects declared on the form config file
      * If the FieldsetElement has a legend, the LegendElement will also be added.
@@ -785,6 +793,15 @@ class FormGenerator implements FormGeneratorObserver{
     }
     
     /**
+     * Get the form error message
+     * @return type 
+     */
+    public function get_mErrorsInForm() {
+        $this->errorsToString();
+        return $this->_mErrorsInForm;
+    }
+    
+    /**
      * Set error message
      * @param string $_mErrorsInForm 
      */
@@ -793,24 +810,21 @@ class FormGenerator implements FormGeneratorObserver{
     }
     
     /**
-     * Set the form error message
+     * Get all the form errors into a string
      * @param string $errors
      */
-    private function setErrors(array $errors)
+    public function errorsToString()
     {
-        $this->_mErrorsInForm .= implode("<br/>", $errors) . "<br/>";
-    }
-    
-    /**
-     * Get the form error message
-     * @return type 
-     */
-    public function get_mErrorsInForm() {
-        return $this->_mErrorsInForm;
+        if(!$this->_mErrors->isEmpty()) {
+            foreach ($this->_mErrors as $errors) {
+                $this->_mErrorsInForm .= implode("<br/>", $errors) . "<br/>";
+            }
+        }
     }
     
     /**
      * Is CSRF Token active in form
+     * If the form is in render debug state it will always return false
      * @return boolean
      */
     public function get_isCSRFToken() {
@@ -843,7 +857,7 @@ class FormGenerator implements FormGeneratorObserver{
             $csrf_token->set_mValue($csrf_tokern_value);
             
             if($csrf_token->getCSRFToken($formId) != $csrf_token->get_mValue()) {
-                $formObj->setErrors(array("Invalid Csrf Token"));
+                $formObj->addElementErrors(array("Invalid Csrf Token"));
                 $formObj->save();
                 return false;
             }
@@ -891,7 +905,7 @@ class FormGenerator implements FormGeneratorObserver{
                                                                     $submited_data[$element->get_mName()] : null;
                             $element->set_mValue($element_value);
                             if(!$element->isValid($formObj)) {
-                                $formObj->setErrors($element->get_mErrors());
+                                $formObj->addElementErrors($element->get_mErrors());
                                 $check_form = false;
                             }	
                         }
