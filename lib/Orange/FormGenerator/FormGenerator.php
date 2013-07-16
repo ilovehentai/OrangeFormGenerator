@@ -905,7 +905,7 @@ class FormGenerator implements FormGeneratorObserver{
                                                                     $submited_data[$element->get_mName()] : null;
                             $element->set_mValue($element_value);
                             if(!$element->isValid($formObj)) {
-                                $formObj->addElementErrors($element->get_mErrors());
+                                $formObj->addElementErrors($element->get_mErrors()->toArray());
                                 $check_form = false;
                             }	
                         }

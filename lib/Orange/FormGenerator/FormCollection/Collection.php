@@ -31,4 +31,8 @@ class Collection implements \IteratorAggregate
     public function get($index) {
         return $this->_items[$index];
     }
+    
+    public function toArray() {
+        return $this->_items;
+    }
 }

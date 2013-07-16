@@ -15,9 +15,9 @@ abstract class BaseElement implements InterfaceElement, ElementObservable{
     protected $_mId;
     protected $_mElementData;
     protected $_mValidations;
-    protected $_mObservers = array();
+    protected $_mObservers;
     protected $_mName;
-    protected $_mErrors = array();
+    protected $_mErrors;
     protected $_mCheckName = true;
     protected $_mlabel;
     protected $_mValue;
@@ -40,8 +40,9 @@ abstract class BaseElement implements InterfaceElement, ElementObservable{
         }
         
         $this->_mElementData = $config;
-        $this->_mErrors = array();
+        $this->_mErrors = new Collection();
         $this->_mValidations = new Collection();
+        $this->_mObservers = new Collection();
     }
     
     /**
@@ -156,7 +157,6 @@ abstract class BaseElement implements InterfaceElement, ElementObservable{
     
     public function isValid(FormGenerator $form = null)
     {
-        $this->_mErrors = array();
         if(!$this->_mValidations->isEmpty())
         {
             foreach($this->_mValidations as /* @var $validation BaseValidation */ $validation)
@@ -169,20 +169,20 @@ abstract class BaseElement implements InterfaceElement, ElementObservable{
                 
                 if(!$validation->isValid($this->_mValue))
                 {
-                    $this->_mErrors[] = $validation->get_mErrorMessage();
+                    $this->_mErrors->add($validation->get_mErrorMessage());
                 }
             }
         }
         
-        return (!empty($this->_mErrors)) ? false : true;
+        return (!$this->_mErrors->isEmpty()) ? false : true;
     }
     
     public function addObserver(FormGenerator $observer) {
-        $this->_mObservers[] = $observer;
+        $this->_mObservers->add($observer);
     }
     
     public function notify(array $info = array()) {
-        if(!empty($this->_mObservers)){
+        if(!$this->_mObservers->isEmpty()){
             foreach($this->_mObservers  as $observers)
             {
                 /* @var $observers FormGenerator */
@@ -207,6 +207,11 @@ abstract class BaseElement implements InterfaceElement, ElementObservable{
         $this->_mName = $_mName;
     }
     
+    /**
+     * Return a Collection of errors found after validation of the input
+     * data or empty in case of successful validation.
+     * @return Collection
+     */
     public function get_mErrors() {
         return $this->_mErrors;
     }
