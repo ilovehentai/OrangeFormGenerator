@@ -1,0 +1,30 @@
+## YAML Template.
+## Form with text calendar radio checkboxs textarea hidden submit reset
+## button image file captcha password select optiongroup pushbutton
+---
+template: locale.html
+
+configs:
+  rootDir: %DIR%/../../..
+  cacheDir: %ROOT%/example/cache/
+  templateDir: %ROOT%/example/configs/
+
+form:
+  id: locale_form
+  action: self
+  method: post
+  enctype: multipart/form-data
+  attributes: {name: locale_form, class: sp_css}
+
+fieldset: 
+  - id: group1
+    legend:
+      text: Select Language
+      attributes: {class: legend_xpto}
+
+fields:
+  - id: locale
+    type: select
+    label: Locale
+    attributes: { name: locale}
+    options: {pt_PT: Português, fr_CH: Français, gb_UK: English}
