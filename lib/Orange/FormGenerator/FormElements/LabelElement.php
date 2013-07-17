@@ -1,7 +1,7 @@
 <?php
 namespace FormGenerator\FormElements;
 
-final class LabelElement extends BaseElement{
+final class LabelElement extends TranslatableElement{
     
     protected $_mAttributes;
 
@@ -19,6 +19,7 @@ final class LabelElement extends BaseElement{
         }
         $label_html = parent::build();
         
+        $this->translate();
         return str_replace("-data-", $this->_mElementData['text'], $label_html);
     }
 }

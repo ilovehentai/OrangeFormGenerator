@@ -1,7 +1,7 @@
 <?php
 namespace FormGenerator\FormElements;
 
-final class LegendElement extends BaseElement{
+final class LegendElement extends TranslatableElement{
     
     protected $_mAttributes;
 
@@ -15,6 +15,7 @@ final class LegendElement extends BaseElement{
     public function build() {
         
         $label_html = parent::build();
+        $this->translate();
         return str_replace("-data-", $this->_mElementData['text'], $label_html);
     }
 }

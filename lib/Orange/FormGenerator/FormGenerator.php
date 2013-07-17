@@ -17,6 +17,7 @@ use FormGenerator\Validation\ValidationConfigClass;
 use FormGenerator\FormGeneratorCache\FormGeneratorCache;
 use FormGenerator\FormCollection\Collection;
 use FormGenerator\FormDataSaver\FormDataSaverFactory;
+use FormGenerator\FormGeneratorTranslations\FromTranslationFactory;
 
 class FormGenerator implements FormGeneratorObserver{
     
@@ -25,6 +26,12 @@ class FormGenerator implements FormGeneratorObserver{
      * @var string
      */
     private $_mId;
+    
+    /**
+     * Form Arguments
+     * @var array 
+     */
+    private $_mArgs;
     /**
      * array Form configuration File name
      * @var string 
@@ -123,6 +130,12 @@ class FormGenerator implements FormGeneratorObserver{
     private $_isCSRFToken = true;
     
     /**
+     * Define the locale for translations
+     * @var string 
+     */
+    private $_mLocale;
+    
+    /**
      * List of defaults values for elements
      * @var array 
      */
@@ -135,17 +148,19 @@ class FormGenerator implements FormGeneratorObserver{
      * it will check whether the file exists and set it as the configuration file
      * if not throws an exception
      * @param string $idform
+     * @param string $config_file
      * @param array $args 
      * @return FormGenerator
      */
     public function __construct($idform, array $args = array())
     {   
         $this->_mId = $idform;
-        $this->checkArguments($args);
+        $this->_mArgs = $args;
         $this->_mElements = new Collection();
         $this->_mFieldset = new Collection();
         $this->_mErrors = new Collection();
         $this->_mDataSaver = FormDataSaverFactory::getFormDataSaverInstance($idform);
+        $this->setConfigFile();
     }
         
     /**
@@ -480,14 +495,13 @@ class FormGenerator implements FormGeneratorObserver{
     private function checkArguments(array $args = array())
     {
         $valid_arguments = array(
-                                 "configDir" => "defineTheConfigDirectory", 
-                                 "configFile" => "defineTheConfigFile", 
                                  "cacheDir" => "defineCacheDirectory",
                                  "templateDir" => "defineTemplateDirectory",
                                  "elements_default_values" => "defineElementsDefaultsValues",
                                  "validationFile" => "defineValidationFile",
                                  "readonly" => "set_mReadOnly",
-                                 "use_csrf_token" => "set_isCSRFToken"
+                                 "use_csrf_token" => "set_isCSRFToken",
+                                 "locale" => "setLocale"
                                 );
         
         foreach($valid_arguments as $key => $method)
@@ -500,6 +514,15 @@ class FormGenerator implements FormGeneratorObserver{
             
             $this->$method($args[$key]);
         }
+        
+    }
+    
+    private function setConfigFile() {
+        
+        $config_dir = (isset($this->_mArgs["configDir"])) ? $this->_mArgs["configDir"] : "";
+        $this->defineTheConfigDirectory($config_dir);
+        $config_file = (isset($this->_mArgs["configFile"])) ? $this->_mArgs["configFile"] : "";
+        $this->defineTheConfigFile($config_file);
         
     }
     
@@ -523,6 +546,7 @@ class FormGenerator implements FormGeneratorObserver{
                 }
             }
             
+            $this->_mFormData["configs"] = array_merge($this->_mArgs, $this->_mFormData["configs"]);
             $this->checkArguments($this->_mFormData["configs"]);
         }
     }
@@ -608,6 +632,7 @@ class FormGenerator implements FormGeneratorObserver{
                     $label = new LabelElement(array("text" => $label_text,
                                                 "attributes" => $label_attributes)
                                         );
+                    $label->setLocale($this->_mLocale);
                 }
                 
                 if($this->_mReadOnly) {
@@ -670,6 +695,7 @@ class FormGenerator implements FormGeneratorObserver{
                     $legend = new LegendElement(array("text" => $fieldset['legend']['text'],
                                                 "attributes" => $fieldset['legend']['attributes'])
                                         );
+                    $legend->setLocale($this->_mLocale);
                 }
                 
                 $this->addFieldset(ElementFactory::creatElement($fieldset), $legend);
@@ -706,6 +732,29 @@ class FormGenerator implements FormGeneratorObserver{
         {
             throw new FormGeneratorException("Error no form config");
         }
+    } 
+    
+    /**
+     * Internal function to chek is the submited CSRF Token is valid
+     * @param \FormGenerator\FormGenerator $formObj
+     * @param string $formId
+     * @param array $submited_data
+     * @return boolean
+     */
+    private function isValidCsrfToken(FormGenerator $formObj, $formId, array $submited_data) {
+        if($this->get_isCSRFToken()) {
+            $csrf_token = $formObj->getElementById($formId . "_csrf_token");
+            $csrf_tokern_value = (array_key_exists($csrf_token->get_mName(), $submited_data)) ? 
+                                                        $submited_data[$csrf_token->get_mName()] : null;
+            $csrf_token->set_mValue($csrf_tokern_value);
+            
+            if($csrf_token->getCSRFToken($formId) != $csrf_token->get_mValue()) {
+                $formObj->addElementErrors(array("Invalid Csrf Token"));
+                $formObj->save();
+                return false;
+            }
+        }
+        return true;
     }
     
     /** Getters and Setters **/
@@ -840,29 +889,21 @@ class FormGenerator implements FormGeneratorObserver{
             $this->_isCSRFToken = $_isCSRFToken;
         }
     }
-        
     
     /**
-     * Internal function to chek is the submited CSRF Token is valid
-     * @param \FormGenerator\FormGenerator $formObj
-     * @param string $formId
-     * @param array $submited_data
-     * @return boolean
+     * Set the locale for translations
+     * @param type $locale
      */
-    private function isValidCsrfToken(FormGenerator $formObj, $formId, array $submited_data) {
-        if($this->get_isCSRFToken()) {
-            $csrf_token = $formObj->getElementById($formId . "_csrf_token");
-            $csrf_tokern_value = (array_key_exists($csrf_token->get_mName(), $submited_data)) ? 
-                                                        $submited_data[$csrf_token->get_mName()] : null;
-            $csrf_token->set_mValue($csrf_tokern_value);
-            
-            if($csrf_token->getCSRFToken($formId) != $csrf_token->get_mValue()) {
-                $formObj->addElementErrors(array("Invalid Csrf Token"));
-                $formObj->save();
-                return false;
-            }
-        }
-        return true;
+    public function setLocale($locale) {
+        $this->_mLocale = $locale;
+    }
+
+    /**
+     * Get the defined Locale for translations
+     * @return string
+     */
+    public static function getLocale() {
+        return $this->_mLocale;
     }
         
     /** Static methods **/
@@ -935,6 +976,10 @@ class FormGenerator implements FormGeneratorObserver{
         return $form_data_saver_adapter::getFormData($formId);
     }
     
+    public static function getFormTranslator($locale ="") {
+        return FromTranslationFactory::getFormTranslationInstance($locale);
+    }
+    
     /**
      * Get the Elements default values
      * @return array 
@@ -989,5 +1034,4 @@ class FormGenerator implements FormGeneratorObserver{
         }
         return false;
     }
-
 }

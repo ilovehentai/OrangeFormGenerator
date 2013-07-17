@@ -42,7 +42,8 @@ $nome_pessoal = "My Name (Default Value)";
                                                  "configFile" => "example.yml",
                                                  "templateDir" => __DIR__ . "/example/configs/",
                                                  "elements_default_values" => array("nome_pessoal" => $nome_pessoal),
-                                                 "readonly" => true
+                                                 "readonly" => true,
+                                                 "locale" => "pt_PT"
                                                 ));
                 $form->set_mDebug(true);
                 echo $form->render();

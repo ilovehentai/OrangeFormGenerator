@@ -2,7 +2,6 @@
     "template": "example.html",
     "configs": {
         "rootDir": "%DIR%/../../..",
-        "configDir": "%ROOT%/example/configs/",
         "cacheDir": "%ROOT%/example/cache/",
         "templateDir": "%ROOT%/example/configs/",
         "elements_default_values": {"nome_pessoal": "My Name (Default Value - Overridden)"},

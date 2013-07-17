@@ -10,6 +10,7 @@ class FormConfig {
     const OFG_DEFAULT_CACHE_DIR = 'Cache';
     const OFG_DEFAULT_FORM_DATA_SAVER_ADAPTER = 'FormGenerator\\FormDataSaver\\SessionFormSaverAdapter';
     const OFG_DEFAULT_TEMPLATE_ENGINE_ADAPTER = 'FormGenerator\\FormGeneratorSimpleTemplateEngine\\SimpleTemplateEngineAdapter';
+    const OFG_DEFAULT_TRANSLATION_ADAPTER = 'FormGenerator\\FormGeneratorTranslations\\SymfonyTranslationAdapter';
     const OFG_DEFAULT_PARSER_ADAPTERS_PATH = 'FormGenerator\\FormParser\\';
     
     const OFG_ERROR_NO_SESSION = "Form %s not found in Session";
@@ -49,6 +50,10 @@ class FormConfig {
     
     public static function getFormDataSaverAdapter() {
         return self::OFG_DEFAULT_FORM_DATA_SAVER_ADAPTER;
+    }
+    
+    public static function getFormTranslationAdapter() {
+        return self::OFG_DEFAULT_TRANSLATION_ADAPTER;
     }
 }
 
