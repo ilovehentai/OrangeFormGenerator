@@ -130,16 +130,16 @@ class FormGenerator implements FormGeneratorObserver{
     private $_isCSRFToken = true;
     
     /**
-     * Define the locale for translations
-     * @var string 
-     */
-    private $_mLocale;
-    
-    /**
      * List of defaults values for elements
      * @var array 
      */
     private static $_mElementsDefaultValues = array();
+    
+    /**
+     * Define the locale for translations
+     * @var string 
+     */
+    private static $_mLocale;
     
     /** Magic methods **/
 
@@ -632,7 +632,6 @@ class FormGenerator implements FormGeneratorObserver{
                     $label = new LabelElement(array("text" => $label_text,
                                                 "attributes" => $label_attributes)
                                         );
-                    $label->setLocale($this->_mLocale);
                 }
                 
                 if($this->_mReadOnly) {
@@ -695,7 +694,6 @@ class FormGenerator implements FormGeneratorObserver{
                     $legend = new LegendElement(array("text" => $fieldset['legend']['text'],
                                                 "attributes" => $fieldset['legend']['attributes'])
                                         );
-                    $legend->setLocale($this->_mLocale);
                 }
                 
                 $this->addFieldset(ElementFactory::creatElement($fieldset), $legend);
@@ -895,7 +893,7 @@ class FormGenerator implements FormGeneratorObserver{
      * @param type $locale
      */
     public function setLocale($locale) {
-        $this->_mLocale = $locale;
+        self::$_mLocale = $locale;
     }
 
     /**
@@ -903,7 +901,7 @@ class FormGenerator implements FormGeneratorObserver{
      * @return string
      */
     public static function getLocale() {
-        return $this->_mLocale;
+        return self::$_mLocale;
     }
         
     /** Static methods **/
@@ -976,8 +974,8 @@ class FormGenerator implements FormGeneratorObserver{
         return $form_data_saver_adapter::getFormData($formId);
     }
     
-    public static function getFormTranslator($locale ="") {
-        return FromTranslationFactory::getFormTranslationInstance($locale);
+    public static function getFormTranslator() {
+        return FromTranslationFactory::getFormTranslationInstance(self::$_mLocale);
     }
     
     /**

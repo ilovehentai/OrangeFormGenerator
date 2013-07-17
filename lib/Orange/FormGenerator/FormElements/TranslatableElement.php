@@ -14,10 +14,9 @@ abstract class TranslatableElement extends BaseElement{
      * @var IFormTranslation 
      */
     protected $_mTranslator;
-    protected $_mLocale;
     
     protected function getTranslator() {
-        $this->_mTranslator = FormGenerator::getFormTranslator($this->_mLocale);
+        $this->_mTranslator = FormGenerator::getFormTranslator();
     }
     
     protected function translate() {
@@ -26,14 +25,6 @@ abstract class TranslatableElement extends BaseElement{
             $this->_mElementData['text'] = $this->_mTranslator->getTranslation($this->_mElementData['text']);
         }
         return false;
-    }
-    
-    public function setLocale($locale) {
-        $this->_mLocale = $locale;
-    }
-    
-    public function getLocale() {
-        return $this->_mLocale;
     }
     
 }
