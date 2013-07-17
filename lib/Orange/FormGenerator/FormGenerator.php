@@ -523,6 +523,8 @@ class FormGenerator implements FormGeneratorObserver{
         $this->defineTheConfigDirectory($config_dir);
         $config_file = (isset($this->_mArgs["configFile"])) ? $this->_mArgs["configFile"] : "";
         $this->defineTheConfigFile($config_file);
+        $cache_path = (isset($this->_mArgs["cacheDir"])) ? $this->_mArgs["cacheDir"] : "";
+        $this->defineCacheDirectory($cache_path);
         
     }
     

@@ -5,7 +5,7 @@ namespace FormGenerator\FormGenerator;
 class FormConfig {
     
     const OFG_VALIDATION_CONFIG_FILE = 'validators.yml';
-    const OFG_CONFIG_FILE = 'example.yml';
+    const OFG_CONFIG_FILE = 'empty.yml';
     const OFG_CONFIG_DIR = 'Configs';
     const OFG_DEFAULT_CACHE_DIR = 'Cache';
     const OFG_DEFAULT_FORM_DATA_SAVER_ADAPTER = 'FormGenerator\\FormDataSaver\\SessionFormSaverAdapter';
@@ -29,7 +29,7 @@ class FormConfig {
     }
     
     public static function getDefaultCacheDir(){
-        return __DIR__ . DIRECTORY_SEPARATOR . self::OFG_DEFAULT_CACHE_DIR . DIRECTORY_SEPARATOR;
+        return __DIR__ . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . self::OFG_DEFAULT_CACHE_DIR . DIRECTORY_SEPARATOR;
     }
     
     public static function getTemplateEngine(){

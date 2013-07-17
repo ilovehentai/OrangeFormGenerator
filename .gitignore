@@ -1,4 +1,5 @@
 /lib/Orange/FormGenerator/cache/*
+/lib/Orange/FormGenerator/Cache/*
 /example/cache/*
 example/cache/*
 /nbproject/*

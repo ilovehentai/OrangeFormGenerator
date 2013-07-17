@@ -22,6 +22,19 @@ $nome_pessoal = "My Name (Default Value)";
     </head>
     <body>
         <img alt="logo" src="/images/logo.png" />
+        <div id="selectlang">
+            <?php
+                $select_lang_form = new FormGenerator("selectlang_form", 
+                                                        array(
+                                                            "configDir" => __DIR__ . "/example/configs/",
+                                                            "cacheDir" => __DIR__ . "/example/cache/",
+                                                            "configFile" => "locale.yml",
+                                                            "locale" => "en_GB")
+                                                        );
+                $select_lang_form->set_mDebug(true);
+                echo $select_lang_form->render();
+            ?>
+        </div>
         <?php
         
         if(isset($_POST['submit'])){
