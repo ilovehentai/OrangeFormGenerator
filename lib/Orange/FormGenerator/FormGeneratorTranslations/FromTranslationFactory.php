@@ -9,9 +9,9 @@ namespace FormGenerator\FormGeneratorTranslations;
  */
 class FromTranslationFactory {
     
-    public static function getFormTranslationInstance($locale = "")
+    public static function getFormTranslationInstance($locale = "", $translations_path = "")
     {
         $class_path = \FormGenerator\FormGenerator\FormConfig::getFormTranslationAdapter();
-        return $class_path::getInstance($locale);
+        return new $class_path($locale, $translations_path);
     }
 }

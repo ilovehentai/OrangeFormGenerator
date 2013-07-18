@@ -4,6 +4,7 @@ use FormGenerator\FormGenerator;
 
 /** Initialize variables **/
 $nome_pessoal = "My Name (Default Value)";
+$locale = (isset($_GET["locale"])) ? $_GET["locale"] : "pt_PT";
 ?>
 <!DOCTYPE html>
 <html>
@@ -19,6 +20,13 @@ $nome_pessoal = "My Name (Default Value)";
         <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/i18n/jquery-ui-i18n.min.js" type="text/javascript"></script>
         <script src="/js/validate.js" type="text/javascript"></script>
         <script src="/js/textcount.js" type="text/javascript"></script>
+        <script type="text/javascript">
+            $(function(){
+               $("#locale").change(function(){
+                  window.location.href = "?locale=" + $(this).val(); 
+               });
+            });
+        </script>
     </head>
     <body>
         <img alt="logo" src="/images/logo.png" />
@@ -56,7 +64,7 @@ $nome_pessoal = "My Name (Default Value)";
                                                  "templateDir" => __DIR__ . "/example/configs/",
                                                  "elements_default_values" => array("nome_pessoal" => $nome_pessoal),
                                                  "readonly" => true,
-                                                 "locale" => "pt_PT"
+                                                 "locale" => $locale
                                                 ));
                 $form->set_mDebug(true);
                 echo $form->render();

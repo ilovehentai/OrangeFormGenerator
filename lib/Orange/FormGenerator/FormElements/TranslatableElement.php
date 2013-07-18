@@ -1,6 +1,6 @@
 <?php
 namespace FormGenerator\FormElements;
-use FormGenerator\FormGenerator;
+use FormGenerator\FormGeneratorTranslations\IFormTranslation;
 
 /**
  * Description of TranslatableElement
@@ -15,14 +15,19 @@ abstract class TranslatableElement extends BaseElement{
      */
     protected $_mTranslator;
     
-    protected function getTranslator() {
-        $this->_mTranslator = FormGenerator::getFormTranslator();
+    public function getTranslator() {
+        return $this->_mTranslator;
+    }
+    
+    public function setTranslator(IFormTranslation $translator) {
+        $this->_mTranslator = $translator;
     }
     
     protected function translate() {
-        $this->getTranslator();
-        if(array_key_exists("text", $this->_mElementData) && !empty($this->_mElementData['text'])) {
-            $this->_mElementData['text'] = $this->_mTranslator->getTranslation($this->_mElementData['text']);
+        if($this->_mTranslator instanceof IFormTranslation) {
+            if(array_key_exists("text", $this->_mElementData) && !empty($this->_mElementData['text'])) {
+                $this->_mElementData['text'] = $this->_mTranslator->getTranslation($this->_mElementData['text']);
+            }
         }
         return false;
     }

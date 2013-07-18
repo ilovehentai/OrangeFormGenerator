@@ -1,0 +1,38 @@
+## YAML Template.
+---
+Personal information: Personal information
+legend_xpto: legend_xpto
+Extra Information: Extra Information
+Name: Name
+Password: Password
+The password field is mandatory and must contain 8 alphanumerics caracters: The password field is mandatory and must contain 8 alphanumerics caracters
+Confirm Password: Confirm Password
+The password and the password confirmation don't match: The password and the password confirmation don't match
+Email: Email
+The email seems invalid: The email seems invalid
+Birth date: Birth date
+The Birth date seems invalid: The Birth date seems invalid
+NIF: NIF
+The NIF number seems invalid: The NIF number seems invalid
+ZIP Code: ZIP Code
+The Zip code seems invalid: The Zip code seems invalid
+The sex field is mandatory: The sex field is mandatory
+Sex: Sex
+M: Male
+F: Female
+Interess: Interess
+The country is mandatory: The country is mandatory
+Portugal: Portugal
+Suisse: Swizerland
+China: China
+Nippon: Japan
+Option Group: Option Group
+Option: Option
+Observations: Observations
+hello world: hello world
+Autorizo: Authorize
+Upload ficheiro: File upload
+button: Button
+Push Button: Push Button
+reset: Reset
+submit: Submit

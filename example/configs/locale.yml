@@ -27,4 +27,4 @@ fields:
     type: select
     label: Locale
     attributes: { name: locale}
-    options: {pt_PT: Português, fr_CH: Français, gb_UK: English}
+    options: {~: Default, pt_PT: Português, fr_CH: Français, gb_UK: English}

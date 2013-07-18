@@ -130,16 +130,28 @@ class FormGenerator implements FormGeneratorObserver{
     private $_isCSRFToken = true;
     
     /**
+     * Define the locale for translations
+     * @var string 
+     */
+    private $_mLocale;
+    
+    /**
+     * Activate CSRF Token
+     * @var boolean 
+     */
+    private $_mTranslations_path;
+    
+    /**
+     * The translator controller
+     * @var FormTranslatorController 
+     */
+    private $_mTranslator;
+    
+    /**
      * List of defaults values for elements
      * @var array 
      */
     private static $_mElementsDefaultValues = array();
-    
-    /**
-     * Define the locale for translations
-     * @var string 
-     */
-    private static $_mLocale;
     
     /** Magic methods **/
 
@@ -171,7 +183,7 @@ class FormGenerator implements FormGeneratorObserver{
     public function __sleep() {
         //Save only important info
         return array("_mId", "_mErrors", "_mElements", "_mListValidators", 
-                                        "_mReadOnly", "_mDataSaver", "_isCSRFToken");
+                                        "_mReadOnly", "_mDataSaver", "_isCSRFToken", "_mTranslator");
     }
     
     public function __wakeup() {
@@ -326,10 +338,11 @@ class FormGenerator implements FormGeneratorObserver{
     {
         if(is_file($this->_mConfigFile))
         {
-                
+            
             $this->parseConfigFile();
             $this->checkConfigsArguments();
             $this->setTemplateFile($template);
+            $this->getFormTranslator();
 
             FormGeneratorCache::iniCache();
             $cache_name = FormGeneratorCache::expectedCacheName($this->_mId, $this->_mConfigFile,
@@ -497,6 +510,7 @@ class FormGenerator implements FormGeneratorObserver{
         $valid_arguments = array(
                                  "cacheDir" => "defineCacheDirectory",
                                  "templateDir" => "defineTemplateDirectory",
+                                 "translationsDir" => "set_mTranslations_path",
                                  "elements_default_values" => "defineElementsDefaultsValues",
                                  "validationFile" => "defineValidationFile",
                                  "readonly" => "set_mReadOnly",
@@ -634,6 +648,8 @@ class FormGenerator implements FormGeneratorObserver{
                     $label = new LabelElement(array("text" => $label_text,
                                                 "attributes" => $label_attributes)
                                         );
+                    $label->setTranslator($this->_mTranslator);
+                    
                 }
                 
                 if($this->_mReadOnly) {
@@ -696,6 +712,7 @@ class FormGenerator implements FormGeneratorObserver{
                     $legend = new LegendElement(array("text" => $fieldset['legend']['text'],
                                                 "attributes" => $fieldset['legend']['attributes'])
                                         );
+                    $legend->setTranslator($this->_mTranslator);
                 }
                 
                 $this->addFieldset(ElementFactory::creatElement($fieldset), $legend);
@@ -755,6 +772,10 @@ class FormGenerator implements FormGeneratorObserver{
             }
         }
         return true;
+    }
+    
+    private function getFormTranslator() {
+        $this->_mTranslator = FromTranslationFactory::getFormTranslationInstance($this->_mLocale, $this->_mTranslations_path);
     }
     
     /** Getters and Setters **/
@@ -859,6 +880,22 @@ class FormGenerator implements FormGeneratorObserver{
     }
     
     /**
+     * Get the translations path
+     * @return string
+     */
+    public function get_mTranslations_path() {
+        return $this->_mTranslations_path;
+    }
+
+    /**
+     * Set the translations path
+     * @param string $_mTranslations_path
+     */
+    public function set_mTranslations_path($_mTranslations_path) {
+        $this->_mTranslations_path = $_mTranslations_path;
+    }
+    
+    /**
      * Get all the form errors into a string
      * @param string $errors
      */
@@ -895,15 +932,15 @@ class FormGenerator implements FormGeneratorObserver{
      * @param type $locale
      */
     public function setLocale($locale) {
-        self::$_mLocale = $locale;
+        $this->_mLocale = $locale;
     }
 
     /**
      * Get the defined Locale for translations
      * @return string
      */
-    public static function getLocale() {
-        return self::$_mLocale;
+    public function getLocale() {
+        return $this->_mLocale;
     }
         
     /** Static methods **/
@@ -974,10 +1011,6 @@ class FormGenerator implements FormGeneratorObserver{
         /* @var $form_data_saver_adapter IFormDataSaver */
         $form_data_saver_adapter = FormDataSaverFactory::getFormDataSaverInstance($formId);
         return $form_data_saver_adapter::getFormData($formId);
-    }
-    
-    public static function getFormTranslator() {
-        return FromTranslationFactory::getFormTranslationInstance(self::$_mLocale);
     }
     
     /**
