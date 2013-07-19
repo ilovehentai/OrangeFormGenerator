@@ -32,6 +32,7 @@ class FormGenerator implements FormGeneratorObserver{
      * @var array 
      */
     private $_mArgs;
+    
     /**
      * array Form configuration File name
      * @var string 
@@ -109,7 +110,7 @@ class FormGenerator implements FormGeneratorObserver{
      * Form submit Collection messages error returned by the validators
      * @var Collection
      */
-    private $_mErrors;
+    private $_mFormErrors;
     
     /**
      * Template form directory path
@@ -128,6 +129,12 @@ class FormGenerator implements FormGeneratorObserver{
      * @var boolean 
      */
     private $_isCSRFToken = true;
+    
+    /**
+     * Define if render js validation
+     * @var boolean 
+     */
+    private $_isRenderJs = true;
     
     /**
      * Define the locale for translations
@@ -170,9 +177,9 @@ class FormGenerator implements FormGeneratorObserver{
         $this->_mArgs = $args;
         $this->_mElements = new Collection();
         $this->_mFieldset = new Collection();
-        $this->_mErrors = new Collection();
+        $this->_mFormErrors = new Collection();
         $this->_mDataSaver = FormDataSaverFactory::getFormDataSaverInstance($idform);
-        $this->setConfigFile();
+        $this->setConfigsPathAndFiles();
     }
         
     /**
@@ -182,7 +189,7 @@ class FormGenerator implements FormGeneratorObserver{
      */
     public function __sleep() {
         //Save only important info
-        return array("_mId", "_mErrors", "_mElements", "_mListValidators", 
+        return array("_mId", "_mFormErrors", "_mElements", "_mListValidators", 
                                         "_mReadOnly", "_mDataSaver", "_isCSRFToken", "_mTranslator");
     }
     
@@ -259,9 +266,52 @@ class FormGenerator implements FormGeneratorObserver{
     }
     
     
+    /**
+     * Add a CSRF Token Element to the form
+     * @return CsrfElement
+     */
+    public function addCsrfToken() {
+        
+        $csrf = ElementFactory::creatElement(array("type" => "CsrfToken", "id" => $this->_mId . "_csrf_token"));
+        $this->addElement($csrf);
+        if($this->get_isCSRFToken()) {
+            $csrf->saveCSRFToken($this->_mId);
+        }
+        
+        return $csrf;
+    }
     
+    /**
+     * Add an error to the error list
+     * @param Collection $errors
+     */
     public function addElementErrors(array $errors) {
-        $this->_mErrors->add($errors);
+        $this->_mFormErrors->add($errors);
+    }
+    
+    /**
+     * Clear the error list
+     */
+    public function clearFormErrors() {
+        if(!$this->_mFormErrors->isEmpty()) {
+            $this->_mFormErrors->clear();
+        }
+    }
+    
+    /**
+     * Load if exists the config file for the form
+     * @throws FormGeneratorException
+     */
+    public function loadConfigFile() {
+        if($this->_mConfigFile !== FormConfig::getDefaultConfigFile()){
+            $this->parseConfigFile();
+            CheckConfigFile::check($this->_mFormData);
+            if(CheckConfigFile::$result != "")
+            {
+                throw new FormGeneratorException(nl2br(CheckConfigFile::$result));
+
+            }
+        }
     }
     
     /**
@@ -336,40 +386,33 @@ class FormGenerator implements FormGeneratorObserver{
      */
     public function render($template = "")
     {
-        if(is_file($this->_mConfigFile))
+        
+        $this->loadConfigFile();
+        $this->checkConfigsArguments();
+        $this->setTemplateFile($template);
+        $this->getFormTranslator();
+
+        FormGeneratorCache::iniCache();
+        $cache_name = FormGeneratorCache::expectedCacheName($this->_mId, $this->_mConfigFile,
+                                                        $this->_mTemplateDir . DIRECTORY_SEPARATOR . $this->_mTemplate);
+        $cache_exist = FormGeneratorCache::checkCacheFile($cache_name);
+        $html = "";
+
+        if($cache_exist === false || $this->_mDebug === true)
         {
-            
-            $this->parseConfigFile();
-            $this->checkConfigsArguments();
-            $this->setTemplateFile($template);
-            $this->getFormTranslator();
 
-            FormGeneratorCache::iniCache();
-            $cache_name = FormGeneratorCache::expectedCacheName($this->_mId, $this->_mConfigFile,
-                                                            $this->_mTemplateDir . DIRECTORY_SEPARATOR . $this->_mTemplate);
-            $cache_exist = FormGeneratorCache::checkCacheFile($cache_name);
-            $html = "";
+            $html = $this->generateForm();
 
-            if($cache_exist === false || $this->_mDebug === true)
-            {
+            FormGeneratorCache::clearFileCache($this->_mId);
+            FormGeneratorCache::saveDataFile($cache_name, $html);
 
-                $html = $this->generateForm();
-
-                FormGeneratorCache::clearFileCache($this->_mId);
-                FormGeneratorCache::saveDataFile($cache_name, $html);
-
-            }
-            else
-            {
-                include FormGeneratorCache::$_cache_path . DIRECTORY_SEPARATOR . $cache_name;
-            }
-
-            return $html;
         }
         else
         {
-            throw new FormGeneratorException("No configuration data no such file: " . $this->_mConfigFile);
+            include FormGeneratorCache::$_cache_path . DIRECTORY_SEPARATOR . $cache_name;
         }
+
+        return $html;
         
     }
     
@@ -515,6 +558,7 @@ class FormGenerator implements FormGeneratorObserver{
                                  "validationFile" => "defineValidationFile",
                                  "readonly" => "set_mReadOnly",
                                  "use_csrf_token" => "set_isCSRFToken",
+                                 "renderjs" => "set_isRenderJs",
                                  "locale" => "setLocale"
                                 );
         
@@ -531,7 +575,7 @@ class FormGenerator implements FormGeneratorObserver{
         
     }
     
-    private function setConfigFile() {
+    private function setConfigsPathAndFiles() {
         
         $config_dir = (isset($this->_mArgs["configDir"])) ? $this->_mArgs["configDir"] : "";
         $this->defineTheConfigDirectory($config_dir);
@@ -543,6 +587,8 @@ class FormGenerator implements FormGeneratorObserver{
     }
     
     private function checkConfigsArguments() {
+        
+        $extra_args = array();
         
         if(isset($this->_mFormData["configs"]) && is_array($this->_mFormData["configs"])) {
             
@@ -561,10 +607,11 @@ class FormGenerator implements FormGeneratorObserver{
                     }
                 }
             }
-            
-            $this->_mFormData["configs"] = array_merge($this->_mArgs, $this->_mFormData["configs"]);
-            $this->checkArguments($this->_mFormData["configs"]);
+            $extra_args = $this->_mFormData["configs"];
         }
+        
+        $this->_mFormData["configs"] = array_merge($this->_mArgs, $extra_args);
+        $this->checkArguments($this->_mFormData["configs"]);
     }
     
     /**
@@ -589,27 +636,20 @@ class FormGenerator implements FormGeneratorObserver{
      */
     private function generateForm()
     {
-        if(!empty($this->_mFormData))
-        {
-            $this->iniForm();
-            
-            CheckConfigFile::check($this->_mFormData);
-            if(CheckConfigFile::$result != "")
-            {
-                return nl2br(CheckConfigFile::$result);
-            }
-            else
-            {
-                $this->getFormElements();
-                $this->getFormFieldsets();
-                /* @var $templateAdapter Patterns\IFormTemplateAdapter */
-                $templateAdapter = FormGeneratorSimpleTemplateEngine\TemplateEngineFactory::getTemplateInstance();
-                $templateAdapter->setTemplatePath($this->_mTemplateDir . $this->_mTemplate);
-                $templateAdapter->setFormElements($this->_mformElement, $this->_mElements, $this->_mFieldset);
-                //$templateAdapter->addJavaScript($this->buildJavaScript());
-                return $templateAdapter->render();
-            }
+        
+        $this->iniForm();
+        $this->getFormElements();
+        $this->getFormFieldsets();
+        
+        /* @var $templateAdapter Patterns\IFormTemplateAdapter */
+        $templateAdapter = FormGeneratorSimpleTemplateEngine\TemplateEngineFactory::getTemplateInstance();
+        $templateAdapter->setTemplatePath($this->_mTemplateDir . $this->_mTemplate);
+        $templateAdapter->setFormElements($this->_mformElement, $this->_mElements, $this->_mFieldset);
+        if($this->get_isRenderJs() === true) {
+            $templateAdapter->addJavaScript($this->buildJavaScript());
         }
+        return $templateAdapter->render();
+        
     }
     
     /**
@@ -735,20 +775,17 @@ class FormGenerator implements FormGeneratorObserver{
      */
     private function iniForm()
     {
-        if(isset($this->_mFormData['form']) && is_array($this->_mFormData['form']))
-        {
-            $csrf = ElementFactory::creatElement(array("type" => "CsrfToken", "id" => $this->_mId . "_csrf_token"));
-            $this->addElement($csrf);
-            if($this->get_isCSRFToken()) {
-                $csrf->saveCSRFToken($this->_mId);
-            }
-            
+        
+        $csrf = $this->addCsrfToken();
+        
+        if($this->_mformElement instanceof FormElement) {
+            $this->_mformElement->set_csrfToken($csrf);
+        } else if(isset($this->_mFormData['form']) && is_array($this->_mFormData['form'])) {
             $this->_mformElement = new FormElement($this->_mFormData['form'], $csrf);
+        } else {
+            throw new FormGeneratorException("Error: No Form Element declared!");
         }
-        else
-        {
-            throw new FormGeneratorException("Error no form config");
-        }
+        
     } 
     
     /**
@@ -779,7 +816,24 @@ class FormGenerator implements FormGeneratorObserver{
     }
     
     /** Getters and Setters **/
+    
+    /**
+     * Get the form id
+     * @return string
+     */
+    public function get_mId() {
+        return $this->_mId;
+    }
 
+    /**
+     * Set de Form Id
+     * @param string $_mId
+     */
+    public function set_mId($_mId) {
+        $this->_mId = $_mId;
+    }
+
+    
     /**
      * Get the config file name
      * @return string 
@@ -896,13 +950,30 @@ class FormGenerator implements FormGeneratorObserver{
     }
     
     /**
+     * Get the form element
+     * @return FormElement
+     */
+    public function get_mformElement() {
+        return $this->_mformElement;
+    }
+
+    /**
+     * Set the form element
+     * @param FormElement $_mformElement
+     */
+    public function set_mformElement(FormElement $_mformElement) {
+        $this->_mformElement = $_mformElement;
+    }
+
+        
+    /**
      * Get all the form errors into a string
      * @param string $errors
      */
     public function errorsToString()
     {
-        if(!$this->_mErrors->isEmpty()) {
-            foreach ($this->_mErrors as $errors) {
+        if(!$this->_mFormErrors->isEmpty()) {
+            foreach ($this->_mFormErrors as $errors) {
                 $this->_mErrorsInForm .= implode("<br/>", $errors) . "<br/>";
             }
         }
@@ -927,6 +998,23 @@ class FormGenerator implements FormGeneratorObserver{
         }
     }
     
+    /**
+     * Get if render JS validation script
+     * @return boolean
+     */
+    public function get_isRenderJs() {
+        return $this->_isRenderJs;
+    }
+
+    /**
+     * Set if render JS validation script
+     * @param boolen $_isRenderJs
+     */
+    public function set_isRenderJs($_isRenderJs) {
+        $this->_isRenderJs = $_isRenderJs;
+    }
+
+        
     /**
      * Set the locale for translations
      * @param type $locale
@@ -982,6 +1070,7 @@ class FormGenerator implements FormGeneratorObserver{
                             $element_value = (array_key_exists($element->get_mName(), $submited_data)) ? 
                                                                     $submited_data[$element->get_mName()] : null;
                             $element->set_mValue($element_value);
+                            $element->get_mErrors()->clear();
                             if(!$element->isValid($formObj)) {
                                 $formObj->addElementErrors($element->get_mErrors()->toArray());
                                 $check_form = false;
@@ -1050,6 +1139,7 @@ class FormGenerator implements FormGeneratorObserver{
     {
         $form = self::getFormData($formId);
         if(is_a($form, "FormGenerator\FormGenerator")) {
+            $form->clearFormErrors();
             $form->set_mErrorsInForm("");
             $form->save();
         }
@@ -1066,5 +1156,11 @@ class FormGenerator implements FormGeneratorObserver{
             return $form->get_mErrorsInForm();
         }
         return false;
+    }
+    
+    public static function prettyvd($a) {
+        echo "<pre>";
+        var_dump($a);
+        echo "</pre>";
     }
 }

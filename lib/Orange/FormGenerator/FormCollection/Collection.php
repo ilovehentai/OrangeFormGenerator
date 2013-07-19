@@ -35,4 +35,9 @@ class Collection implements \IteratorAggregate
     public function toArray() {
         return $this->_items;
     }
+    
+    public function clear() {
+        $this->_items = array();
+        $this->_count = 0;
+    }
 }

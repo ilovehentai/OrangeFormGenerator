@@ -12,39 +12,9 @@ use FormGenerator\FormGeneratorException\FormGeneratorException;
 class SessionFormSaverAdapter implements IFormDataSaver {
 
     private static $_instance;
-    private $_mFormId;
-
-    public function __construct($formId = "") {
-        if (!empty($formId)) {
-            $this->setFormNameSpace($formId);
-        }
-    }
-
-    public function getData() {
-        return unserialize($_SESSION["ofg"][$this->_mFormId]["object"]);
-    }
 
     public function save(FormGenerator $formObj) {
-        $_SESSION["ofg"][$this->_mFormId]["object"] = serialize($formObj);
-    }
-
-    public function setFormNameSpace($formId) {
-        $this->_mFormId = $formId;
-        $this->setSessionNameSpace();
-    }
-
-    private function setSessionNameSpace() {
-        if (session_id() != "") {
-            if (!isset($_SESSION["ofg"][$this->_mFormId])) {
-                $_SESSION["ofg"][$this->_mFormId] = array();
-            } 
-        } else {
-            throw new FormGeneratorException("Session have not been started!");
-        }
-    }
-
-    public static function getInstance($formId = "") {
-        return (!self::$_instance) ? self::$_instance = new SessionFormSaverAdapter($formId) : self::$_instance;
+        $_SESSION["ofg"][$formObj->get_mId()]["object"] = serialize($formObj);
     }
 
     public static function getFormData($formId) {
@@ -74,6 +44,10 @@ class SessionFormSaverAdapter implements IFormDataSaver {
 
     public static function getItem($formId, $index) {
         return $_SESSION["ofg"][$formId][$index];
+    }
+
+    public static function getInstance($formId = "") {
+        return (!self::$_instance) ? self::$_instance = new SessionFormSaverAdapter($formId) : self::$_instance;
     }
     
 }

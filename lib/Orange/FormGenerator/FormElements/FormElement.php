@@ -129,4 +129,13 @@ class FormElement extends BaseElement{
     public function setStream($stream) {
         $this->_stream = $stream;
     }
+    
+    public function get_csrfToken() {
+        return $this->_csrfToken;
+    }
+
+    public function set_csrfToken($_csrfToken) {
+        $this->_csrfToken = $_csrfToken;
+        return $this;
+    }
 }
