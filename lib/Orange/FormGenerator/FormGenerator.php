@@ -178,7 +178,7 @@ class FormGenerator implements FormGeneratorObserver{
         $this->_mElements = new Collection();
         $this->_mFieldset = new Collection();
         $this->_mFormErrors = new Collection();
-        $this->_mDataSaver = FormDataSaverFactory::getFormDataSaverInstance($idform);
+        $this->_mDataSaver = FormDataSaverFactory::getFormDataSaverInstance();
         $this->setConfigsPathAndFiles();
     }
         
@@ -1098,7 +1098,7 @@ class FormGenerator implements FormGeneratorObserver{
     private static function getFormData($formId)
     {
         /* @var $form_data_saver_adapter IFormDataSaver */
-        $form_data_saver_adapter = FormDataSaverFactory::getFormDataSaverInstance($formId);
+        $form_data_saver_adapter = FormDataSaverFactory::getFormDataSaverInstance();
         return $form_data_saver_adapter::getFormData($formId);
     }
     

@@ -13,6 +13,7 @@ interface IFormDataSaver {
     public static function getFormData($formId);
     public static function addItem($formId, $index, $item);
     public static function getItem($formId, $index);
+    public static function getInstance();
 }
 
 ?>

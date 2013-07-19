@@ -3,7 +3,6 @@
 namespace FormGenerator\FormDataSaver;
 
 use FormGenerator\FormGenerator;
-use FormGenerator\FormGeneratorException\FormGeneratorException;
 /**
  * Description of SessionFormSaver
  *
@@ -46,8 +45,8 @@ class SessionFormSaverAdapter implements IFormDataSaver {
         return $_SESSION["ofg"][$formId][$index];
     }
 
-    public static function getInstance($formId = "") {
-        return (!self::$_instance) ? self::$_instance = new SessionFormSaverAdapter($formId) : self::$_instance;
+    public static function getInstance() {
+        return (!self::$_instance) ? self::$_instance = new SessionFormSaverAdapter() : self::$_instance;
     }
     
 }

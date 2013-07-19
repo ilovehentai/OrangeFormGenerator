@@ -9,10 +9,10 @@ namespace FormGenerator\FormDataSaver;
  */
 class FormDataSaverFactory {
     
-    public static function getFormDataSaverInstance($idform = "")
+    public static function getFormDataSaverInstance()
     {
         $adapter = \FormGenerator\FormGenerator\FormConfig::getFormDataSaverAdapter();
-        return $adapter::getInstance($idform);
+        return $adapter::getInstance();
     }
     
 }
