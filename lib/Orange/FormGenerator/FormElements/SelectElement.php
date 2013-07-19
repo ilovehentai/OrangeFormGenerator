@@ -22,13 +22,15 @@ final class SelectElement extends BaseElement{
                 {
                     $op_group = new OptGroupElement($option);
                     $op_group->set_mLabelAttribute($key);
+                    $op_group->setTranslator($this->getTranslator());
                     $options_str .= $op_group->build();
                 }
                 else
                 {
-                    $o_config = array("attributes" => array("value" => $key));
+                    $o_config = array("attributes" => array("value" => $key), "text" => $option);
                     $options_tmp = new OptionElement($o_config);
-                    $options_list[] = $options_tmp->build($option);
+                    $options_tmp->setTranslator($this->getTranslator());
+                    $options_list[] = $options_tmp->build();
                 }
             }
         }

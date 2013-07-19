@@ -76,11 +76,9 @@ input[type=submit], button{
     background-color: #FDFDFD;
     padding: 3px 5px;
 }
-.sex-label{
-    width:15px;
-}
-.group-label{
-    width:55px;
+.sex-label, .group-label{
+    width: auto;
+    padding-right: 10px;
 }
 
 textarea{

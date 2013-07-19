@@ -11,7 +11,7 @@ configs:
   translationsDir: %ROOT%/example/translations/
   elements_default_values: {nome_pessoal: "My Name (Default Value - Overridden)"}
   readonly: false
-  renderjs: false
+  renderjs: true
 
 form:
   id: form1
@@ -91,7 +91,7 @@ fields:
     attributes: { maxlength: 4, style: 'width:30px' }
     
   - id: sex
-    type: radio
+    type: radiogroup
     validation: 
       - rule: checked
         message: The sex field is mandatory
@@ -103,7 +103,7 @@ fields:
       - {label: F, value: f, checked: checked, attributes:{class: sex-label}}
 
   - id: interess
-    type: checkbox
+    type: checkboxgroup
     label: Interess
     name: interesses
     attributes: {}

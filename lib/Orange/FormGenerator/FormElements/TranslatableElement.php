@@ -7,7 +7,7 @@ use FormGenerator\FormGeneratorTranslations\IFormTranslation;
  *
  * @author josesantos
  */
-abstract class TranslatableElement extends BaseElement{
+abstract class TranslatableElement{
     
     /**
      * Form Translation Adapter Instance
@@ -28,6 +28,13 @@ abstract class TranslatableElement extends BaseElement{
             if(array_key_exists("text", $this->_mElementData) && !empty($this->_mElementData['text'])) {
                 $this->_mElementData['text'] = $this->_mTranslator->getTranslation($this->_mElementData['text']);
             }
+        }
+        return false;
+    }
+    
+    protected function translateAttribute($attibute) {
+        if($this->_mTranslator instanceof IFormTranslation) {
+                return $this->_mTranslator->getTranslation($attibute);
         }
         return false;
     }

@@ -189,7 +189,7 @@ class FormGenerator implements FormGeneratorObserver{
      */
     public function __sleep() {
         //Save only important info
-        return array("_mId", "_mFormErrors", "_mElements", "_mListValidators", 
+        return array("_mId", "_mLocale", "_mFormErrors", "_mElements", "_mListValidators", 
                                         "_mReadOnly", "_mDataSaver", "_isCSRFToken", "_mTranslator");
     }
     
@@ -345,7 +345,8 @@ class FormGenerator implements FormGeneratorObserver{
                     foreach($validatores as $fields) {
                         $js_validatores[] = '{"validator" : "' . 
                                                     $fields['rule'] . '", "msg" : "' . 
-                                                    $fields['message'] . '"}';
+                                                    $this->_mTranslator->getTranslation($fields['message']) . 
+                                            '"}';
                     }
                     $js_string_option .= implode(",", $js_validatores);
                     $js_string_option .= ']';
@@ -699,7 +700,9 @@ class FormGenerator implements FormGeneratorObserver{
                 
                 //Check First if a element already exists in the form element list. Cannot have duplicates id on the form
                 if(!$this->isElementById($field["id"])) {
-                    $this->addElement(ElementFactory::creatElement($field), $label);
+                    $element = ElementFactory::creatElement($field);
+                    $element->setTranslator($this->_mTranslator);
+                    $this->addElement($element, $label);
                 }
             }
         }

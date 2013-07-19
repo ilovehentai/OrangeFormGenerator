@@ -8,7 +8,7 @@ use FormGenerator\Validation\ValidationConfigClass;
 use FormGenerator\FormElements\LabelElement;
 use FormGenerator\FormCollection\Collection;
 
-abstract class BaseElement implements InterfaceElement, ElementObservable{
+abstract class BaseElement extends TranslatableElement implements InterfaceElement, ElementObservable{
     
     protected $_mAttributes = null;
     protected $_mSkeleton;
@@ -73,7 +73,10 @@ abstract class BaseElement implements InterfaceElement, ElementObservable{
                 if(is_array($class_info) && array_key_exists("class", $class_info))
                 {
                     $vinfo = array_merge($vinfo, $class_info);
-                    $this->_mValidations->add(ValidationFactory::creatElement($vinfo));
+                    $validator = ValidationFactory::creatElement($vinfo);
+                    /* @var $validator BaseValidation */
+                    $validator->setTranslator($this->getTranslator());
+                    $this->_mValidations->add($validator);
                     $this->notify($vinfo);
                 }
             }

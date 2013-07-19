@@ -20,6 +20,8 @@ final class PushbuttonElement extends BaseElement{
         $push_button = parent::build();
         
         parent::setValue();
+        $this->translate();
+        
         $push_button = str_replace("-val-", $this->_mElementData['text'], $push_button);
         
         return $push_button;

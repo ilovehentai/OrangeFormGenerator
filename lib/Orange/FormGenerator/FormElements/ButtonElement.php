@@ -10,4 +10,13 @@ final class ButtonElement extends InputElement{
         parent::__construct($config);
         $this->_mAttributes['type'] = "button";
     }
+    
+    public function build() {
+        
+        if(isset($this->_mAttributes['value'])) {
+            $this->_mAttributes['value'] = $this->translateAttribute($this->_mAttributes['value']);
+        }
+        
+        return parent::build();
+    }
 }

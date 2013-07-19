@@ -1,7 +1,7 @@
 <?php
 namespace FormGenerator\FormElements;
 
-final class LegendElement extends TranslatableElement{
+final class LegendElement extends BaseElement{
     
     protected $_mAttributes;
 

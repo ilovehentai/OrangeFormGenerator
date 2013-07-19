@@ -9,8 +9,9 @@ final class OptionElement extends BaseElement{
         $this->_mSkeleton = "<option%s>options</option>";
     }
     
-    public function build($value = "") {
+    public function build() {
         $option = parent::build();
-        return str_replace("options", $value, $option);
+        $this->translate();
+        return str_replace("options", $this->_mElementData["text"], $option);
     }
 }

@@ -1,7 +1,7 @@
 <?php
 namespace FormGenerator\FormElements;
 
-final class LabelElement extends TranslatableElement{
+final class LabelElement extends BaseElement{
     
     protected $_mAttributes;
 

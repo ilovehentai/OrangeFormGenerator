@@ -2,11 +2,10 @@
 
 namespace FormGenerator\Validation;
 
-class BaseValidation implements ValidationInterface{
+class BaseValidation extends TranslatableValidation implements ValidationInterface{
     
     protected $_mFormID;
     protected $_mTitleMsg;
-    protected $_mErrorMsg;
     protected $_hasMatch = false;
     
     protected $_mExpression;
@@ -16,7 +15,6 @@ class BaseValidation implements ValidationInterface{
     public function __construct($config)
     {
         $this->_mErrorMessage = $config['message'];
-        $this->_mErrorMsg = $config['message'];
     }
 
     public function isValid($value) {
@@ -41,6 +39,7 @@ class BaseValidation implements ValidationInterface{
     }
     
     public function get_mErrorMessage() {
+        $this->translate();
         return $this->_mErrorMessage;
     }
     

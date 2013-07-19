@@ -10,4 +10,13 @@ final class SubmitElement extends InputElement{
         parent::__construct($config);
         $this->_mAttributes['type'] = "submit";
     }
+    
+    public function build() {
+        
+        if(isset($this->_mAttributes['value'])) {
+            $this->_mAttributes['value'] = $this->translateAttribute($this->_mAttributes['value']);
+        }
+        
+        return parent::build();
+    }
 }

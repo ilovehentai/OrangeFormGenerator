@@ -16,6 +16,7 @@ class SymfonyTranslationAdapter implements IFormTranslation{
     private static $instance;
     
     public function __construct($locale = "", $translations_path = "") {
+        $this->_locale = $locale;
         $this->_translator = new Translator($locale);
         $this->setTranslationsPath($translations_path);
     }

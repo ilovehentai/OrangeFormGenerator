@@ -19,7 +19,7 @@ final class OptGroupElement extends BaseElement{
     public function build() {
         if(!empty($this->_mLabelAttribute))
         {
-            $this->_mAttributes['label'] = $this->_mLabelAttribute;
+            $this->_mAttributes['label'] = $this->translateAttribute($this->_mLabelAttribute);
         }
         $optiongroup = parent::build();
         $options = $this->buildOptionElement();
@@ -39,9 +39,10 @@ final class OptGroupElement extends BaseElement{
         {
             foreach($this->_mOption_element_list as $key => $op)
             {
-                $o_config = array("attributes" => array("value" => $key));
+                $o_config = array("attributes" => array("value" => $key), "text" => $op);
                 $options_tmp = new OptionElement($o_config);
-                $op_tmp[] = $options_tmp->build($op);
+                $options_tmp->setTranslator($this->getTranslator());
+                $op_tmp[] = $options_tmp->build();
             }
         }
         
