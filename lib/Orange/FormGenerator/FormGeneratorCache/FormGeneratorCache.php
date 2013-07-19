@@ -92,7 +92,7 @@ class FormGeneratorCache{
         {
             if (($handle = opendir(self::$_cache_path))){
                 while (false !== ($file = readdir($handle))) {
-                    if (preg_match("/^" . $idForm . "_([0-9abcdef])+\.php$/", $file)) {
+                    if (preg_match("/^" . $idForm . "_([0-9abcdef])+$/", $file)) {
                         unlink(self::$_cache_path . $file);
                     }
                 }
