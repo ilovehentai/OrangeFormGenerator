@@ -1,8 +1,8 @@
 - Modo AjaxSubmit no FormGenerator
-- Por o validation config file num ficheiro de configurações da biblioteca, config path tambem
 - Se alterarmos o template a cache nao o vai permitir porque ela so valida o config
-- Internacionalizar
+- Internacionalizar (falta apenas os default values)
 - dizer nas select qual a selected
 - o sistema ja nao permite criar forms sem ficheiros de configuracao, tem que ser revisto
-- permitir criar um form sem ter que o guardar em sessao
 - aliementar as options, radio, checkbox de algum datasource
+- Default empty template
+- Add options as collection and options group

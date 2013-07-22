@@ -11,7 +11,7 @@ configs:
   translationsDir: %ROOT%/example/translations/
   elements_default_values: {nome_pessoal: "My Name (Default Value - Overridden)"}
   readonly: false
-  renderjs: true
+  renderjs: false
 
 form:
   id: form1

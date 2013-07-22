@@ -2,6 +2,13 @@
 require_once(__DIR__ . DIRECTORY_SEPARATOR . "example" . DIRECTORY_SEPARATOR . "init.php");
 use FormGenerator\FormGenerator;
 
+/** For the select lang form **/
+use FormGenerator\FormElements\FormElement;
+use FormGenerator\FormElements\SelectElement;
+use \FormGenerator\FormElements\LabelElement;
+use FormGenerator\FormElements\FieldsetElement;
+use FormGenerator\FormElements\LegendElement;
+
 /** Initialize variables **/
 $nome_pessoal = "My Name (Default Value)";
 $locale = (isset($_GET["locale"])) ? $_GET["locale"] : "pt_PT";
@@ -33,14 +40,34 @@ $locale = (isset($_GET["locale"])) ? $_GET["locale"] : "pt_PT";
         <div id="selectlang">
             <?php
                 $select_lang_form = new FormGenerator("selectlang_form", 
-                                                        array(
-                                                            "configDir" => __DIR__ . "/example/configs/",
-                                                            "cacheDir" => __DIR__ . "/example/cache/",
-                                                            "configFile" => "locale.yml",
-                                                            "locale" => "en_GB")
-                                                        );
+                                                            array(
+                                                                    "rootDir" => "%DIR%/../../..", 
+                                                                    "cacheDir" => "%ROOT%/example/cache/",
+                                                                    "templateDir" => "%ROOT%/example/configs/")
+                                                     );
+                
+                $config_for_formelement = array(
+                                                "id" => "locale_form", "action" => "self", "method" => "post", "enctype" => "",
+                                                "attributes" => array("name" => "locale_form", "class" => "sp_css")
+                                                );
+                $select_lang_form->set_mformElement(new FormElement($config_for_formelement));
+                $options_for_select = array("~" => "Default", "pt_PT" => "Português", "fr_CH" => "Français", "gb_UK" => "English");
+                $config_for_select = array("attributes" => array("id" => "locale", "name" => "locale"), "options" => $options_for_select);
+                $select_element = new SelectElement($config_for_select);
+                $select_element->setTranslator($select_lang_form->getFormTranslator());
+                $fieldset_element = new FieldsetElement(array("attributes" => array("id" => "group1")));
+                $select_lang_form->addFieldset($fieldset_element, new LegendElement(
+                                                                                array("text" => "Select Language", 
+                                                                                      "attributes" => array("class" => "legend_xpto"))
+                                                                                ));
+                $select_lang_form->addElement($select_element, new LabelElement(
+                                                                                array("text" => "Locale", 
+                                                                                      "attributes" => array("for" => "locale"))
+                                                                                ));
+                $select_lang_form->setLocale("en_GB");
                 $select_lang_form->set_mDebug(true);
-                echo $select_lang_form->render();
+                
+                echo $select_lang_form->render("locale.html");
             ?>
         </div>
         <?php
@@ -69,6 +96,7 @@ $locale = (isset($_GET["locale"])) ? $_GET["locale"] : "pt_PT";
                 $form->set_mDebug(true);
                 echo $form->render();
                 echo $form->renderDebug();
+                
                 
             } catch (Exception $e) {
                 echo  $e->getMessage();

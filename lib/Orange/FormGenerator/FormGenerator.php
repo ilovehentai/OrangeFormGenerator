@@ -18,6 +18,7 @@ use FormGenerator\FormGeneratorCache\FormGeneratorCache;
 use FormGenerator\FormCollection\Collection;
 use FormGenerator\FormDataSaver\FormDataSaverFactory;
 use FormGenerator\FormGeneratorTranslations\FromTranslationFactory;
+use FormGenerator\FormGeneratorTranslations\IFormTranslation;
 
 class FormGenerator implements FormGeneratorObserver{
     
@@ -137,6 +138,13 @@ class FormGenerator implements FormGeneratorObserver{
     private $_isRenderJs = true;
     
     /**
+     * Define if the form only outputs html 
+     * with no events or actions enabled
+     * @var boolean
+     */
+    private $_outputOnly = false;
+    
+    /**
      * Define the locale for translations
      * @var string 
      */
@@ -150,7 +158,7 @@ class FormGenerator implements FormGeneratorObserver{
     
     /**
      * The translator controller
-     * @var FormTranslatorController 
+     * @var IFormTranslation
      */
     private $_mTranslator;
     
@@ -216,7 +224,9 @@ class FormGenerator implements FormGeneratorObserver{
      * On destruct save the form in the session
      */
     public function __destruct() {
-        $this->save();
+        if(!$this->_outputOnly) {
+            $this->save();
+        }
     }
     
     /** Public methods **/
@@ -543,14 +553,23 @@ class FormGenerator implements FormGeneratorObserver{
     }
     
     
+    /**
+     * Get the form Translator
+     */
+    public function getFormTranslator() {
+        $this->_mTranslator = FromTranslationFactory::getFormTranslationInstance($this->_mLocale, $this->_mTranslations_path);
+        return $this->_mTranslator;
+    }
+    
+    
     /** Private Methods **/
     
     /**
      * check and site formGenerator basic arguments. Non valid arguments are ignored.
-     * @param array $args 
      */
-    private function checkArguments(array $args = array())
+    private function checkArguments()
     {
+        $this->setRootPath();
         $valid_arguments = array(
                                  "cacheDir" => "defineCacheDirectory",
                                  "templateDir" => "defineTemplateDirectory",
@@ -560,20 +579,40 @@ class FormGenerator implements FormGeneratorObserver{
                                  "readonly" => "set_mReadOnly",
                                  "use_csrf_token" => "set_isCSRFToken",
                                  "renderjs" => "set_isRenderJs",
+                                 "renderonly" => "set_outputOnly",
                                  "locale" => "setLocale"
                                 );
         
         foreach($valid_arguments as $key => $method)
         {
             
-            if(!array_key_exists($key, $args))
+            if(!array_key_exists($key, $this->_mFormData["configs"]))
             {
-                $args[$key] = null;
+                $this->_mFormData["configs"][$key] = null;
             }
             
-            $this->$method($args[$key]);
+            $this->$method($this->_mFormData["configs"][$key]);
         }
         
+    }
+    
+    private function setRootPath() {
+        
+        $root_dir = "";
+        if(array_key_exists("rootDir", $this->_mFormData["configs"])) {
+            $root_dir = str_replace("%DIR%", __DIR__, $this->_mFormData["configs"]["rootDir"]);
+        }
+        
+        foreach ($this->_mFormData["configs"] as $key => $config) {
+            if(is_string($config)) {
+                if(strstr($config, "%DIR%")){
+                    $this->_mFormData["configs"][$key] = str_replace("%DIR%", __DIR__, $config);
+                }
+                if(strstr($config, "%ROOT%")){
+                    $this->_mFormData["configs"][$key] = str_replace("%ROOT%", $root_dir, $config);
+                }
+            }
+        }
     }
     
     private function setConfigsPathAndFiles() {
@@ -592,27 +631,11 @@ class FormGenerator implements FormGeneratorObserver{
         $extra_args = array();
         
         if(isset($this->_mFormData["configs"]) && is_array($this->_mFormData["configs"])) {
-            
-            $root_dir = "";
-            
-            foreach ($this->_mFormData["configs"] as $key => $config) {
-                if(is_string($config)) {
-                    if(strstr($config, "%DIR%")){
-                        $this->_mFormData["configs"][$key] = str_replace("%DIR%", __DIR__, $config);
-                    }
-                    if(strstr($config, "%ROOT%")){
-                        $this->_mFormData["configs"][$key] = str_replace("%ROOT%", $root_dir, $config);
-                    }
-                    if($key == "rootDir") {
-                        $root_dir = $this->_mFormData["configs"][$key];
-                    }
-                }
-            }
             $extra_args = $this->_mFormData["configs"];
         }
         
         $this->_mFormData["configs"] = array_merge($this->_mArgs, $extra_args);
-        $this->checkArguments($this->_mFormData["configs"]);
+        $this->checkArguments();
     }
     
     /**
@@ -812,10 +835,6 @@ class FormGenerator implements FormGeneratorObserver{
             }
         }
         return true;
-    }
-    
-    private function getFormTranslator() {
-        $this->_mTranslator = FromTranslationFactory::getFormTranslationInstance($this->_mLocale, $this->_mTranslations_path);
     }
     
     /** Getters and Setters **/
@@ -1033,7 +1052,23 @@ class FormGenerator implements FormGeneratorObserver{
     public function getLocale() {
         return $this->_mLocale;
     }
-        
+    
+    /**
+     * Get if the form only output to html with no events or actions
+     * @return boolean
+     */
+    public function get_outputOnly() {
+        return $this->_outputOnly;
+    }
+
+    /**
+     * Set to only output the form with no actions or events
+     * @param boolean $_outputOnly
+     */
+    public function set_outputOnly($_outputOnly) {
+        $this->_outputOnly = $_outputOnly;
+    }
+            
     /** Static methods **/
     
     /**

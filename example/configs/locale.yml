@@ -8,6 +8,7 @@ configs:
   rootDir: %DIR%/../../..
   cacheDir: %ROOT%/example/cache/
   templateDir: %ROOT%/example/configs/
+  renderonly: true
 
 form:
   id: locale_form
