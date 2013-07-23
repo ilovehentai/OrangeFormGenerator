@@ -5,6 +5,7 @@ final class OptGroupElement extends BaseElement{
     
     private $_mOption_element_list = array();
     private $_mLabelAttribute;
+    private $_selected;
     
     public function __construct(array $config = array())
     {
@@ -42,6 +43,9 @@ final class OptGroupElement extends BaseElement{
                 $o_config = array("attributes" => array("value" => $key), "text" => $op);
                 $options_tmp = new OptionElement($o_config);
                 $options_tmp->setTranslator($this->getTranslator());
+                if($key == $this->_selected) {
+                    $options_tmp->addAttribute("selected", "selected");
+                }
                 $op_tmp[] = $options_tmp->build();
             }
         }
@@ -59,5 +63,9 @@ final class OptGroupElement extends BaseElement{
 
     public function set_mLabelAttribute($_mLabelAttribute) {
         $this->_mLabelAttribute = $_mLabelAttribute;
+    }
+    
+    public function fillElement($value) {
+        $this->_selected = $value;
     }
 }

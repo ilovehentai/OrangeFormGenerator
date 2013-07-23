@@ -26,12 +26,17 @@ class FormElement extends BaseElement{
         }
     }
     
-    private function processFormAttributes(array $data)
+    private function processFormAttributes()
     {
-        $this->set_mAction($data['action']);
-        $this->set_mEnctype($data['enctype']);
-        $this->set_mId($data['id']);
-        $this->set_mMethod($data['method']);
+        $this->_formData['id'] = (isset($this->_formData['id'])) ? $this->_formData['id'] : "";
+        $this->_formData['action'] = (isset($this->_formData['action'])) ? $this->_formData['action'] : "";
+        $this->_formData['enctype'] = (isset($this->_formData['enctype'])) ? $this->_formData['enctype'] : "application/x-www-form-urlencoded";
+        $this->_formData['method'] = (isset($this->_formData['method'])) ? $this->_formData['method'] : "get";
+        
+        $this->set_mId($this->_formData['id']);
+        $this->set_mAction($this->_formData['action']);
+        $this->set_mEnctype($this->_formData['enctype']);
+        $this->set_mMethod($this->_formData['method']);
     }
     
     public function build(){

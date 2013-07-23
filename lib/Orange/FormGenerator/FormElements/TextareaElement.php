@@ -24,4 +24,8 @@ final class TextareaElement extends BaseElement{
         
         return $textarea;
     }
+    
+    public function fillElement($value) {
+        $this->_mElementData['text'] = $value;
+    }
 }

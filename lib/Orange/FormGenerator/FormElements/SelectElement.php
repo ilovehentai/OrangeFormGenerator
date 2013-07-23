@@ -4,6 +4,8 @@ namespace FormGenerator\FormElements;
 
 final class SelectElement extends BaseElement{
     
+    private $_selected;
+    
     public function __construct(array $config = array())
     {
         parent::__construct($config);
@@ -23,6 +25,9 @@ final class SelectElement extends BaseElement{
                     $op_group = new OptGroupElement($option);
                     $op_group->set_mLabelAttribute($key);
                     $op_group->setTranslator($this->getTranslator());
+                    if(!is_null($this->_selected)) {
+                        $op_group->fillElement($this->_selected);
+                    }
                     $options_str .= $op_group->build();
                 }
                 else
@@ -30,6 +35,9 @@ final class SelectElement extends BaseElement{
                     $o_config = array("attributes" => array("value" => $key), "text" => $option);
                     $options_tmp = new OptionElement($o_config);
                     $options_tmp->setTranslator($this->getTranslator());
+                    if($key == $this->_selected) {
+                        $options_tmp->addAttribute("selected", "selected");
+                    }
                     $options_list[] = $options_tmp->build();
                 }
             }
@@ -50,5 +58,9 @@ final class SelectElement extends BaseElement{
         $select = parent::build();
         $select = str_replace("-options-", $this->getOptions(), $select);
         return $select;
+    }
+    
+    public function fillElement($value) {
+        return $this->_selected = $value;
     }
 }

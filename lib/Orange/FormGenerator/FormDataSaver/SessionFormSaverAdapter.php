@@ -15,6 +15,32 @@ class SessionFormSaverAdapter implements IFormDataSaver {
     public function save(FormGenerator $formObj) {
         $_SESSION["ofg"][$formObj->get_mId()]["object"] = serialize($formObj);
     }
+    
+    public function delete($formId){
+        $_SESSION["ofg"][$formObj->get_mId()] = null;
+        unset($_SESSION["ofg"][$formId]);
+    }
+    
+    public function addItemValue($formId, $elementId, $value) {
+        $_SESSION["ofg"][$formId]["saved_values"][$elementId] = $value;
+    }
+    
+    public function getItemValue($formId, $elementId) {
+        if(isset($_SESSION["ofg"][$formId]["saved_values"][$elementId])) {
+            return $_SESSION["ofg"][$formId]["saved_values"][$elementId];
+        }
+        return false;
+    }
+    
+    public function deleteItem($formId, $elementId) {
+        $_SESSION["ofg"][$formId]["saved_values"][$elementId] = null;
+        unset($_SESSION["ofg"][$formId]["saved_values"][$elementId]);
+    }
+    
+    public function deleteAllItems($formId) {
+        $_SESSION["ofg"][$formId]["saved_values"] = null;
+        unset($_SESSION["ofg"][$formId]["saved_values"]);
+    }
 
     public static function getFormData($formId) {
         if(self::isFormNameSpace($formId)) {
@@ -50,5 +76,3 @@ class SessionFormSaverAdapter implements IFormDataSaver {
     }
     
 }
-
-?>

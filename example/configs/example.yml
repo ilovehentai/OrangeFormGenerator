@@ -12,6 +12,7 @@ configs:
   elements_default_values: {nome_pessoal: "My Name (Default Value - Overridden)"}
   readonly: false
   renderjs: false
+  save_on_submition: [name, email, date, nif, zip, sex, interess, countrys, optiongroup, observ, autorizo]
 
 form:
   id: form1
@@ -92,9 +93,10 @@ fields:
     
   - id: sex
     type: radiogroup
-    validation: 
-      - rule: checked
-        message: The sex field is mandatory
+    name: sex
+#    validation: 
+#      - rule: checked
+#        message: The sex field is mandatory
     label: 
       text: Sex
     attributes: { name: sex}
@@ -105,7 +107,7 @@ fields:
   - id: interess
     type: checkboxgroup
     label: Interess
-    name: interesses
+    name: interess
     attributes: {}
     group: 
       - { label: Sports, value: sports, attributes:{class: group-label}}

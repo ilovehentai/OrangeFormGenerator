@@ -163,6 +163,13 @@ class FormGenerator implements FormGeneratorObserver{
     private $_mTranslator;
     
     /**
+     * Collection of elements id to save after post. 
+     * This allow to recover the post values of those items
+     * @var Collection 
+     */
+    private $_mSave_on_submition;
+    
+    /**
      * List of defaults values for elements
      * @var array 
      */
@@ -186,6 +193,7 @@ class FormGenerator implements FormGeneratorObserver{
         $this->_mElements = new Collection();
         $this->_mFieldset = new Collection();
         $this->_mFormErrors = new Collection();
+        $this->_mSave_on_submition = new Collection();
         $this->_mDataSaver = FormDataSaverFactory::getFormDataSaverInstance();
         $this->setConfigsPathAndFiles();
     }
@@ -198,7 +206,7 @@ class FormGenerator implements FormGeneratorObserver{
     public function __sleep() {
         //Save only important info
         return array("_mId", "_mLocale", "_mFormErrors", "_mElements", "_mListValidators", 
-                                        "_mReadOnly", "_mDataSaver", "_isCSRFToken", "_mTranslator");
+                             "_mReadOnly", "_mDataSaver", "_isCSRFToken", "_mTranslator", "_mSave_on_submition");
     }
     
     public function __wakeup() {
@@ -538,6 +546,11 @@ class FormGenerator implements FormGeneratorObserver{
         }
     }
     
+    /**
+     * Search and get the value from an Element
+     * @param string $element_id
+     * @return string
+     */
     public function getElementValue($element_id) {
         $value = false;
         if(!$this->_mElements->isEmpty()) {
@@ -561,6 +574,13 @@ class FormGenerator implements FormGeneratorObserver{
         return $this->_mTranslator;
     }
     
+    /**
+     * Delete all items values saved on submission
+     */
+    public function clearStoredItemsValues() {
+        $this->_mDataSaver->deleteAllItems($this->_mId);
+    }
+    
     
     /** Private Methods **/
     
@@ -580,7 +600,8 @@ class FormGenerator implements FormGeneratorObserver{
                                  "use_csrf_token" => "set_isCSRFToken",
                                  "renderjs" => "set_isRenderJs",
                                  "renderonly" => "set_outputOnly",
-                                 "locale" => "setLocale"
+                                 "locale" => "setLocale",
+                                 "save_on_submition" => "defineSaveOnSubmitionElements"
                                 );
         
         foreach($valid_arguments as $key => $method)
@@ -596,6 +617,9 @@ class FormGenerator implements FormGeneratorObserver{
         
     }
     
+    /**
+     * Parse the root path defined in all configurations
+     */
     private function setRootPath() {
         
         $root_dir = "";
@@ -615,6 +639,9 @@ class FormGenerator implements FormGeneratorObserver{
         }
     }
     
+    /**
+     * Set the configurations files and path. If nothing is defined, the default values are loaded.
+     */
     private function setConfigsPathAndFiles() {
         
         $config_dir = (isset($this->_mArgs["configDir"])) ? $this->_mArgs["configDir"] : "";
@@ -626,6 +653,10 @@ class FormGenerator implements FormGeneratorObserver{
         
     }
     
+    /**
+     * Add configs arguments from a configuration file to the configurations passed to this object.
+     * The arguments are then checked and validated.
+     */
     private function checkConfigsArguments() {
         
         $extra_args = array();
@@ -636,6 +667,18 @@ class FormGenerator implements FormGeneratorObserver{
         
         $this->_mFormData["configs"] = array_merge($this->_mArgs, $extra_args);
         $this->checkArguments();
+    }
+    
+    /**
+     * Pass an array of elements id to be saved after form submition
+     * @param array $items
+     */
+    private function defineSaveOnSubmitionElements(array $items = null){
+        if(!empty($items)) {
+            foreach($items as $item) {
+                $this->addSave_on_submitionItemId($item);
+            }
+        }
     }
     
     /**
@@ -664,6 +707,7 @@ class FormGenerator implements FormGeneratorObserver{
         $this->iniForm();
         $this->getFormElements();
         $this->getFormFieldsets();
+        $this->transferSavedElementValues();
         
         /* @var $templateAdapter Patterns\IFormTemplateAdapter */
         $templateAdapter = FormGeneratorSimpleTemplateEngine\TemplateEngineFactory::getTemplateInstance();
@@ -731,6 +775,11 @@ class FormGenerator implements FormGeneratorObserver{
         }
     }
     
+    /**
+     * look if a element exist. If true the key position is given else false.
+     * @param string $id
+     * @return type
+     */
     private function isElementById($id) {
         $found = false;
         if($this->_mElements->getIterator()->valid()) {
@@ -745,6 +794,11 @@ class FormGenerator implements FormGeneratorObserver{
         return $found;
     }
     
+    /**
+     * Get an element by is Id, false if the element wasn't found
+     * @param string $id
+     * @return boolean
+     */
     private function getElementById($id) {
         $pos = $this->isElementById($id);
         if($pos !== false) {
@@ -835,6 +889,22 @@ class FormGenerator implements FormGeneratorObserver{
             }
         }
         return true;
+    }
+    
+    /**
+     * Transfer the saved values after post to the from elements
+     */
+    private function transferSavedElementValues() {
+        if(!$this->_mSave_on_submition->isEmpty()) {
+            foreach($this->_mSave_on_submition as $item) {
+                $value = $this->_mDataSaver->getItemValue($this->_mId, $item);
+                if($value !== false) {
+                    if(($element = $this->getElementById($item)) !== false){
+                        $element->fillElement($value);
+                    }
+                }
+            }
+        }
     }
     
     /** Getters and Setters **/
@@ -1068,7 +1138,64 @@ class FormGenerator implements FormGeneratorObserver{
     public function set_outputOnly($_outputOnly) {
         $this->_outputOnly = $_outputOnly;
     }
-            
+    
+    /**
+     * Return the collection of items id to be saved after post
+     * @return Collection
+     */
+    public function get_mSave_on_submition() {
+        return $this->_mSave_on_submition;
+    }
+
+    /**
+     * Set a collection of items id to be save after post
+     * @param Collection $_mSave_on_post
+     */
+    public function set_mSave_on_submition(Collection $_mSave_on_submition) {
+        $this->_mSave_on_submition = $_mSave_on_submition;
+    }
+    
+    /**
+     * Add an item id to the collection of items to be saved after post
+     * @param string $item
+     */
+    public function addSave_on_submitionItemId($item){
+        $this->_mSave_on_submition->add($item);
+    }
+    
+    /**
+     * Verify if element is to be saved
+     * @param string $elementId
+     * @return boolean
+     */
+    public function isElementValueToBeSaved($elementId) {
+        if(!$this->_mSave_on_submition->isEmpty()) {
+            foreach($this->_mSave_on_submition as $item) {
+                if($item == $elementId) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * Save a element value in the data saver to recover after submission
+     * @param string $elementId
+     * @param string $value
+     */
+    public function saveElementValue($elementId, $value) {
+        /** @var $this->_mDataSaver \FormGenerator\FormDataSaver\IFormDataSaver **/
+        $this->_mDataSaver->addItemValue($this->_mId, $elementId, $value);
+    }
+    
+    /**
+     * Delete all saved element values
+     */
+    public function deleteElementsValue(){
+        $this->_mDataSaver->deleteAllItems($this->_mId);
+    }
+                
     /** Static methods **/
     
     /**
@@ -1092,15 +1219,16 @@ class FormGenerator implements FormGeneratorObserver{
                     
                     if($submited_data){
                         
+                        $formObj->deleteElementsValue();
+                        
                         if(!$formObj->isValidCsrfToken($formObj, $formId, $submited_data)) {
                             return false;
                         }
-                        
                         $check_form = true;
                         foreach($formObj->_mElements as $element)
                         {
                             /* @var $element BaseElement */
-                            if(is_a($element,"FormGenerator\FormElements\FileElement"))
+                            if($element instanceof FormGenerator\FormElements\FileElement)
                             {
                                 $submited_data[$element->get_mName()] = $_FILES[$element->get_mName()]["name"];
                             }
@@ -1112,12 +1240,20 @@ class FormGenerator implements FormGeneratorObserver{
                             if(!$element->isValid($formObj)) {
                                 $formObj->addElementErrors($element->get_mErrors()->toArray());
                                 $check_form = false;
-                            }	
+                            }
+                            if($formObj->isElementValueToBeSaved($element->get_mId())) {
+                                $formObj->saveElementValue($element->get_mId(), $element->get_mValue());
+                            }
                         }
                         
                     }
                 }
                 $formObj->save();
+                
+                if($check_form) {
+                    $formObj->clearStoredItemsValues();
+                }
+                
             } else {
                 throw new FormGeneratorException("Invalid Form Data for Form ID: $formId");
             }
