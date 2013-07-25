@@ -10,4 +10,10 @@ final class CheckboxElement extends InputElement{
         parent::__construct($config);
         $this->_mAttributes['type'] = "checkbox";
     }
+    
+    public function fillElement($value) {
+        if($value == $this->getAttribute("value")){
+            $this->addAttribute("checked", "checked");
+        }
+    }
 }

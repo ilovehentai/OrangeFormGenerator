@@ -10,4 +10,10 @@ final class RadioElement extends InputElement{
         parent::__construct($config);
         $this->_mAttributes['type'] = "radio";
     }
+    
+    public function fillElement($value) {
+        if($value == $this->getAttribute("value")){
+            $this->addAttribute("checked", "checked");
+        }
+    }
 }

@@ -9,13 +9,13 @@ namespace FormGenerator\FormElements;
  */
 final class RadiogroupElement extends BaseElement {
 
+    private $_checked;
+    
     public function build() {
+        parent::build();
         $str_element = "";
         if (array_key_exists("group", $this->_mElementData) && is_array($this->_mElementData['group'])) {
             $list_tmp_radio = array();
-            if (substr($this->_mAttributes['name'], -2) != "[]") {
-                $this->_mAttributes['name'] .= "[]";
-            }
 
             foreach ($this->_mElementData['group'] as $key => $group) {
                 $attributes['attributes'] = $this->_mAttributes;
@@ -33,12 +33,13 @@ final class RadiogroupElement extends BaseElement {
                     $label_tmp->setTranslator($this->getTranslator());
                     $label = $label_tmp->build();
                 }
-
-                if (array_key_exists("checked", $group)) {
-                    $attributes['attributes']['checked'] = $group["checked"];
-                }
-
+                
                 $radio_tmp = new RadioElement($attributes);
+                if((!is_null($this->_checked) && $this->_checked == $radio_tmp->getAttribute("value"))
+                        || (is_null($this->_checked) && array_key_exists("checked", $group))){
+                    $radio_tmp->addAttribute("checked", "checked");
+                }
+                
                 $list_tmp_radio[] = $label . $radio_tmp->build();
             }
 
@@ -47,6 +48,10 @@ final class RadiogroupElement extends BaseElement {
             }
         }
         return $str_element;
+    }
+    
+    public function fillElement($value) {
+        $this->_checked = $value;
     }
 
 }

@@ -144,6 +144,15 @@ abstract class BaseElement extends TranslatableElement implements InterfaceEleme
         }
     }
     
+    public function getAttribute($attribute)
+    {
+        if(isset($this->_mAttributes[$attribute]))
+        {
+            return $this->_mAttributes[$attribute];
+        }
+        return false;
+    }
+    
     protected function setValue()
     {
         if(!array_key_exists("text", $this->_mElementData) || empty($this->_mElementData['text']))
@@ -156,6 +165,10 @@ abstract class BaseElement extends TranslatableElement implements InterfaceEleme
            $index = substr($this->_mElementData['text'], 1);
            $this->_mElementData['text'] = FormGenerator::get_mElementDefaultValues($index);
         }
+    }
+    
+    public function fillElement($value){
+        $this->addAttribute("value", $value);
     }
     
     public function isValid(FormGenerator $form = null)

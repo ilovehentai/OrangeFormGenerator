@@ -9,6 +9,8 @@ namespace FormGenerator\FormElements;
  */
 final class CheckboxgroupElement extends BaseElement{
     
+    private $_checked;
+    
     public function build() {
         
         $this->checkAttributeName();
@@ -42,11 +44,13 @@ final class CheckboxgroupElement extends BaseElement{
                     $label = $label_tmp->build();
                 }
                 
-                if(array_key_exists("checked", $group)){
-                    $attributes['attributes']['checked'] = $group["checked"];
+                $checkbox_tmp = new CheckboxElement($attributes);
+                
+                if((!is_null($this->_checked) && in_array($checkbox_tmp->getAttribute("value"), $this->_checked))
+                        || (is_null($this->_checked) && array_key_exists("checked", $group))) {
+                    $checkbox_tmp->addAttribute("checked", "checked");
                 }
                 
-                $checkbox_tmp = new CheckboxElement($attributes);
                 $list_tmp_checkbox[] = $label . $checkbox_tmp->build();
             }
             
@@ -58,6 +62,14 @@ final class CheckboxgroupElement extends BaseElement{
         }
         
         return $str_element ;
+    }
+
+    public function set_mName($_mName) {
+        $this->_mName = str_replace("[]", "", $_mName);
+    }
+    
+    public function fillElement(array $value = null) {
+        $this->_checked = $value;
     }
     
 }
