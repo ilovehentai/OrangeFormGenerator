@@ -5,13 +5,15 @@ use FormGenerator\FormGenerator;
 /** For the select lang form **/
 use FormGenerator\FormElements\FormElement;
 use FormGenerator\FormElements\SelectElement;
-use \FormGenerator\FormElements\LabelElement;
+use FormGenerator\FormElements\OptionElement;
+use FormGenerator\FormElements\LabelElement;
 use FormGenerator\FormElements\FieldsetElement;
 use FormGenerator\FormElements\LegendElement;
 
 /** Initialize variables **/
 $nome_pessoal = "My Name (Default Value)";
-$locale = (isset($_GET["locale"])) ? $_GET["locale"] : "pt_PT";
+$locale = filter_input(INPUT_GET, "locale", FILTER_SANITIZE_STRING);
+$locale = (!empty($locale)) ? $locale : "pt_PT";
 ?>
 <!DOCTYPE html>
 <html>
@@ -51,9 +53,12 @@ $locale = (isset($_GET["locale"])) ? $_GET["locale"] : "pt_PT";
                                                 "attributes" => array("name" => "locale_form", "class" => "sp_css")
                                                 );
                 $select_lang_form->set_mformElement(new FormElement($config_for_formelement));
-                $options_for_select = array("~" => "Default", "pt_PT" => "Português", "fr_CH" => "Français", "gb_UK" => "English");
+                $options_for_select = array("pt_PT" => "Português", "fr_CH" => "Français", "gb_UK" => "English");
                 $config_for_select = array("attributes" => array("id" => "locale", "name" => "locale"), "options" => $options_for_select);
                 $select_element = new SelectElement($config_for_select);
+                $select_element->addOption(new OptionElement(array("text" => "Default", 
+                                                                   "attributes" => array("value" => "~")
+                                                                )));
                 $select_element->setTranslator($select_lang_form->getFormTranslator());
                 $fieldset_element = new FieldsetElement(array("attributes" => array("id" => "group1")));
                 $select_lang_form->addFieldset($fieldset_element, new LegendElement(
