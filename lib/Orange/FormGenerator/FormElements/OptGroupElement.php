@@ -1,9 +1,12 @@
 <?php
 namespace FormGenerator\FormElements;
 
+use FormGenerator\FormCollection\Collection;
+
 final class OptGroupElement extends BaseElement{
     
     private $_mOption_element_list = array();
+    private $_OptionsCollection;
     private $_mLabelAttribute;
     private $_selected;
     
@@ -15,6 +18,7 @@ final class OptGroupElement extends BaseElement{
             $this->_mOption_element_list = $config;
         }
         $this->_mSkeleton = "<optgroup%s>-data-</optgroup>";
+        $this->_OptionsCollection = new Collection();
     }
     
     public function build() {
@@ -23,38 +27,26 @@ final class OptGroupElement extends BaseElement{
             $this->_mAttributes['label'] = $this->translateAttribute($this->_mLabelAttribute);
         }
         $optiongroup = parent::build();
-        $options = $this->buildOptionElement();
-        return str_replace("-data-", $options, $optiongroup);
+        $this->setOptions();
+        return str_replace("-data-", $this->buildOptions(), $optiongroup);
     }
     
-    public function addOptionElement(OptionElement $op)
+    public function setOptions()
     {
-        $this->_mOption_element_list[] = $op;
-    }
-    
-    public function buildOptionElement()
-    {
-        $str_op = "";
-        $op_tmp = array();
+        
         if(!empty($this->_mOption_element_list))
         {
-            foreach($this->_mOption_element_list as $key => $op)
+            foreach($this->_mOption_element_list as $opt_value => $opt_text)
             {
-                $o_config = array("attributes" => array("value" => $key), "text" => $op);
-                $options_tmp = new OptionElement($o_config);
-                $options_tmp->setTranslator($this->getTranslator());
-                if($key == $this->_selected) {
-                    $options_tmp->addAttribute("selected", "selected");
+                $o_config = array("attributes" => array("value" => $opt_value), "text" => $opt_text);
+                $option = new OptionElement($o_config);
+                $option->setTranslator($this->getTranslator());
+                if($opt_value == $this->_selected) {
+                    $option->addAttribute("selected", "selected");
                 }
-                $op_tmp[] = $options_tmp->build();
+                $this->addOption($option);
             }
         }
-        
-        if(!empty($op_tmp))
-        {
-            $str_op = implode("\n", $op_tmp);
-        }
-        return $str_op;
     }
     
     public function get_mLabelAttribute() {
@@ -65,7 +57,32 @@ final class OptGroupElement extends BaseElement{
         $this->_mLabelAttribute = $_mLabelAttribute;
     }
     
+    public function addOption(OptionElement $option) {
+        $this->_OptionsCollection->add($option);
+    }
+    
+    public function clearOptions() {
+        $this->_OptionsCollection->clear();
+    }
+    
     public function fillElement($value) {
         $this->_selected = $value;
+    }
+    
+    private function buildOptions()
+    {
+        if(!$this->_OptionsCollection->isEmpty()){
+            return $this->optionsToString($this->_OptionsCollection);
+        }
+        
+        return "";
+    }
+    
+    private function optionsToString(Collection $optCollection) {
+        $opt_string = "";
+        foreach($optCollection as $opt_group) {
+            $opt_string .= $opt_group->build();
+        }
+        return $opt_string;
     }
 }

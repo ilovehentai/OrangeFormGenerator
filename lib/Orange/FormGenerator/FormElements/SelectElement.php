@@ -8,6 +8,7 @@ final class SelectElement extends BaseElement{
     
     private $_OptionsCollection;
     private $_OptionGroupsCollection;
+    private $_selected;
     
     public function __construct(array $config = array())
     {
@@ -44,6 +45,10 @@ final class SelectElement extends BaseElement{
         $this->_OptionGroupsCollection->clear();
     }
     
+    public function fillElement($value) {
+        $this->_selected = $value;
+    }
+    
     private function setOptions()
     {        
         if(!empty($this->_mElementData['options']))
@@ -55,6 +60,7 @@ final class SelectElement extends BaseElement{
                     $op_group = new OptGroupElement($opt_text);
                     $op_group->set_mLabelAttribute($opt_value);
                     $op_group->setTranslator($this->getTranslator());
+                    $op_group->fillElement($this->_selected);
                     $this->addOptionGroup($op_group);
                 }
                 else
@@ -62,6 +68,9 @@ final class SelectElement extends BaseElement{
                     $o_config = array("attributes" => array("value" => $opt_value), "text" => $opt_text);
                     $option = new OptionElement($o_config);
                     $option->setTranslator($this->getTranslator());
+                    if($opt_value == $this->_selected) {
+                        $option->addAttribute("selected", "selected");
+                    }
                     $this->addOption($option);
                 }
             }
