@@ -4,11 +4,6 @@ use FormGenerator\FormCollection\Collection;
 use FormGenerator\FormGeneratorSimpleTemplateEngine\SimpleTemplateEngine;
 use FormGenerator\FormElements\FormElement;
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  * Description of BasicTemplateEngineAdapter
  *
@@ -22,8 +17,10 @@ class SimpleTemplateEngineAdapter implements IFormTemplateAdapter{
         $this->_mTemplateEngine = new SimpleTemplateEngine();
     }
 
-    public function setTemplatePath($path) {
-        $this->_mTemplateEngine->set_template_path($path);
+    public function setTemplatePath($path=null) {
+        if(is_file($path)) {
+            $this->_mTemplateEngine->set_template_path($path);
+        }
     }
 
     public function render() {

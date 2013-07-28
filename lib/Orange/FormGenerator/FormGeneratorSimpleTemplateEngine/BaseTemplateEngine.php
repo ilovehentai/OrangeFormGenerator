@@ -4,12 +4,9 @@ namespace FormGenerator\FormGeneratorSimpleTemplateEngine;
 use FormGenerator\FormElements\BaseElement;
 use FormGenerator\FormElements\FieldsetElement;
 use FormGenerator\FormCollection\Collection;
-use FormGenerator\FormGeneratorException\FormGeneratorException;
+use FormGenerator\FormElements\LegendElement;
+use FormGenerator\FormElements\LabelElement;
 use FormGenerator\FormElements\FormElement;
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 /**
  * Description of BasicTemplateEngine
@@ -18,92 +15,69 @@ use FormGenerator\FormElements\FormElement;
  */
 class BaseTemplateEngine {
     
-    private $_template_path = "";
-    private $_form_tag;
-    private $_elementsCollection;
-    private $_fieldsetCollection;
-    private $_js = "";
+    protected $_template_path = "";
+    protected $_form_tag;
+    protected $_elementsCollection;
+    protected $_fieldsetCollection;
+    protected $_js = "";
+    protected $_template_stream;
     
     /**
-     * Load and return the html template buffer as a string
-     * If a template name is passed to the method, it will check if the
-     * file exists.
-     * If not throws an exception
-     * @return string 
+     * set a empty stream
      */
-    private function getTemplateStream()
+    protected function getTemplateStream()
     {
-        if(is_file($this->_template_path))
-        {
-            ob_start();
-            include($this->_template_path);
-            return ob_get_clean();
-        }
-        else
-        {
-            throw new FormGeneratorTemplateException("Error no template file");
-        }
+        $this->_template_stream = "";
     }
     
     
     /**
      * Place the fieldset and legends elemets into the html template
-     * @param string $stream
-     * @param Collection $fieldsetCollection
-     * @return string 
      */
-    private function placeFieldsetElements($stream, Collection $fieldsetCollection)
+    protected function placeFieldsetElements()
     {
-        if(!empty($fieldsetCollection))
+        if(!$this->_fieldsetCollection->isEmpty())
         {
-            foreach($fieldsetCollection as $key => /* @var $element FieldsetElement */ $element)
+            foreach($this->_fieldsetCollection as /* @var $element FieldsetElement */ $element)
             {
                 $element->build();
                 $fieldset_parts = $element->getOpenAndCloseTag();
                 
-                $stream = str_replace("{%fieldset-" . $element->get_mId() . "%}", $fieldset_parts[0], $stream);
-                $stream = str_replace("{%/fieldset-" . $element->get_mId() . "%}", $fieldset_parts[1], $stream);
+                $this->_template_stream .= $fieldset_parts[0];
                 
-                if(is_a($element->get_mLegend(), "FormGenerator\FormElements\LegendElement"))
+                if($element->get_mLegend() instanceof LegendElement)
                 {
-                    $tag = "{%legend-" . $element->get_mId() . "%}";
-                    $stream = str_replace($tag, $element->get_mLegend()->build(), $stream);
+                    $this->_template_stream .= $element->get_mLegend()->build();
                 }
+                
+                $this->_template_stream .= $fieldset_parts[1];
             }
         }
-        return $stream;
     }
     
     /**
      * Place the form and labels elemets into the html template
-     * @param Collection $elementsCollection
-     * @param Collection $fieldsetCollection
-     * @return string 
      */
-    public function placeFormElements(Collection $elementsCollection, Collection $fieldsetCollection)
+    public function placeFormElements()
     {
-        $stream = $this->getTemplateStream();
-        $stream = $this->placeFieldsetElements($stream, $fieldsetCollection);
-        
-        if(!empty($elementsCollection))
+        if(!$this->_elementsCollection->isEmpty())
         {
-            foreach($elementsCollection as $key => /* @var $element BaseElement */ $element)
+            foreach($this->_elementsCollection as /* @var $element BaseElement */ $element)
             {
-                $stream = str_replace("{%" . $element->get_mId() . "%}", $element->build(), $stream);
-                if(is_a($element->get_mlabel(), "FormGenerator\FormElements\LabelElement"))
+                if($element->get_mlabel() instanceof LabelElement)
                 {
-                    $tag = "{%label-" . $element->get_mId() . "%}";
-                    $stream = str_replace($tag, $element->get_mlabel()->build(), $stream);
+                    $this->_template_stream .= $element->get_mlabel()->build();
                 }
+                $this->_template_stream .= $element->build();
             }
         }
-        
-        return $stream;
     }
     
     public function compile() {
-        $html = $this->placeFormElements($this->_elementsCollection, $this->_fieldsetCollection);
-        $this->_form_tag->setStream($html);
+        $this->getTemplateStream();
+        $this->placeFieldsetElements();
+        $this->placeFormElements();
+        $this->_form_tag->setStream($this->_template_stream);
         $html = $this->_form_tag->build();
         $html .= $this->_js;
         return $html;
@@ -144,6 +118,4 @@ class BaseTemplateEngine {
     public function set_fieldsetCollection(Collection $fieldsetCollection) {
         $this->_fieldsetCollection = $fieldsetCollection;
     }
-
-
 }

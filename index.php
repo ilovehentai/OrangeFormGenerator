@@ -77,9 +77,9 @@ $locale = (!empty($locale)) ? $locale : "pt_PT";
             ?>
         </div>
         <?php
-        
+        $clear_saved_data = true;
         if(isset($_POST['submit'])){
-            
+            $clear_saved_data = false;
             if(FormGenerator::isValid('simple_form') === true){
                 echo "submetido com sucesso";
             }else{
@@ -100,6 +100,9 @@ $locale = (!empty($locale)) ? $locale : "pt_PT";
                                              "locale" => $locale
                                             ));
             $form->set_mDebug(true);
+            if($clear_saved_data) {
+                $form->clearStoredItemsValues();
+            }
             echo $form->render();
             echo $form->renderDebug();
 

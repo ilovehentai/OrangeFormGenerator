@@ -12,7 +12,7 @@ use FormGenerator\FormElements\FormElement;
  * @author josesantos
  */
 interface IFormTemplateAdapter {
-    function setTemplatePath($path);
+    function setTemplatePath($path=null);
     function setFormElements(FormElement $formElement, Collection $elementsCollection, Collection $fieldsetCollection);
     function render();
     function addJavaScript($jscript);
