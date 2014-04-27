@@ -43,7 +43,7 @@ $locale = (!empty($locale)) ? $locale : "pt_PT";
             <?php
                 $select_lang_form = new FormGenerator("selectlang_form", 
                                                             array(
-                                                                    "rootDir" => "%DIR%/../../..", 
+                                                                    "rootDir" => "%DIR%/../../../..", 
                                                                     "cacheDir" => "%ROOT%/example/cache/",
                                                                     "templateDir" => "%ROOT%/example/configs/")
                                                      );
@@ -52,8 +52,8 @@ $locale = (!empty($locale)) ? $locale : "pt_PT";
                                                 "id" => "locale_form",
                                                 "attributes" => array("name" => "locale_form", "class" => "sp_css")
                                                 );
-                $select_lang_form->set_outputOnly(true);
-                $select_lang_form->set_mformElement(new FormElement($config_for_formelement));
+                $select_lang_form->setOutputOnly(true);
+                $select_lang_form->setFormElement(new FormElement($config_for_formelement));
                 $options_for_select = array("pt_PT" => "Português", "fr_CH" => "Français", "gb_UK" => "English");
                 $config_for_select = array("attributes" => array("id" => "locale", "name" => "locale"), "options" => $options_for_select);
                 $select_element = new SelectElement($config_for_select);
@@ -71,7 +71,7 @@ $locale = (!empty($locale)) ? $locale : "pt_PT";
                                                                                       "attributes" => array("for" => "locale"))
                                                                                 ));
                 $select_lang_form->setLocale("en_GB");
-                $select_lang_form->set_mDebug(true);
+                $select_lang_form->setDebug(true);
                 
                 echo $select_lang_form->render("locale.html");
             ?>
@@ -92,14 +92,14 @@ $locale = (!empty($locale)) ? $locale : "pt_PT";
             $form = new FormGenerator("simple_form", 
                                         array(
                                              "configDir" => __DIR__ . "/example/configs/",
-                                             "cacheDir" => __DIR__ . "/example/cache/",
+                                             "cacheDir" => __DIR__ . "/example/mycache/",
                                              "configFile" => "example.yml",
                                              "templateDir" => __DIR__ . "/example/configs/",
                                              "elements_default_values" => array("nome_pessoal" => $nome_pessoal),
                                              "readonly" => true,
                                              "locale" => $locale
                                             ));
-            $form->set_mDebug(true);
+            $form->setDebug(true);
             if($clear_saved_data) {
                 $form->clearStoredItemsValues();
             }

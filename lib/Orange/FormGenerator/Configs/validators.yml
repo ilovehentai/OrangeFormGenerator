@@ -1,7 +1,7 @@
 ## YAML Template.
 ## validatores rules
 ---
-js_template: /Configs/baseTemplates/basejs.html
+js_template: /../Configs/baseTemplates/basejs.html
 title_msg: Error in fields form
 error_msg: Some errors were founds
 

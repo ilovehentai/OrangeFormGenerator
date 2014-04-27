@@ -158,7 +158,6 @@
                                         {
                                             var valreg = (val.validator).substr((val.validator).indexOf(":") + 1, (val.validator).length);
                                             var validator = (val.validator).substr(0, (val.validator).indexOf(":"));
-
                                             regex = masks[validator](valreg);
                                         }
                                         else
@@ -171,7 +170,7 @@
                                                 regex = masks[val.validator];
                                             }
                                         }
-
+                                        
                                         if(regex === false || !value.match(regex))
                                         {
                                             valid = false;

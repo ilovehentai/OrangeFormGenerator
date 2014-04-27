@@ -13,11 +13,11 @@ class SessionFormSaverAdapter implements IFormDataSaver {
     private static $_instance;
 
     public function save(FormGenerator $formObj) {
-        $_SESSION["ofg"][$formObj->get_mId()]["object"] = serialize($formObj);
+        $_SESSION["ofg"][$formObj->getFormId()]["object"] = serialize($formObj);
     }
     
     public function delete($formId){
-        $_SESSION["ofg"][$formObj->get_mId()] = null;
+        $_SESSION["ofg"][$formObj->getFormId()] = null;
         unset($_SESSION["ofg"][$formId]);
     }
     
