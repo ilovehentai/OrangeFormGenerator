@@ -99,7 +99,7 @@ $locale = (!empty($locale)) ? $locale : "pt_PT";
                                              "readonly" => true,
                                              "locale" => $locale
                                             ));
-            $form->setDebug(true);
+            $form->setDebug(false);
             if($clear_saved_data) {
                 $form->clearStoredItemsValues();
             }

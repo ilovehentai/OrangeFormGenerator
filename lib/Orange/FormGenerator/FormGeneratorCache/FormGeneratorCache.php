@@ -26,7 +26,7 @@ class FormGeneratorCache{
     }   
     
     /**
-     * Build cache file
+     * Initialize cache file path
      */
     public static function iniCache()
     {
@@ -34,7 +34,7 @@ class FormGeneratorCache{
         {
             if(!mkdir(self::$_cache_path))
             {
-                throw new FormGeneratorCacheException("Cache building error no such path: " . self::$_cache_path);
+                throw new FormGeneratorCacheException("Cache building error, error on open or create path: " . self::$_cache_path);
             }
         }
     }
@@ -43,11 +43,13 @@ class FormGeneratorCache{
      * Save data in the cache file
      * @param string $file
      * @param string $data
-     * @param boolean $asUniq 
      */
-    public static function saveDataFile($file, $data, $asUniq = false)
+    public static function saveDataFile($file, $data)
     {
-        file_put_contents(self::$_cache_path . $file, $data);
+        if(!file_put_contents(self::$_cache_path . $file, $data))
+        {
+            throw new FormGeneratorCacheException("Unable to write cache file: " . self::$_cache_path . $file);
+        }
     }
     
     /**
@@ -83,26 +85,49 @@ class FormGeneratorCache{
     }
     
     /**
-     * Remove unused cached files
+     * Remove unused cached files for a specific form
      * @param string $idForm 
      */
     public static function clearFileCache($idForm)
     {
         if(is_dir(self::$_cache_path))
         {
-            if (($handle = opendir(self::$_cache_path))){
-                while (false !== ($file = readdir($handle))) {
-                    if (preg_match("/^" . $idForm . "_([0-9abcdef])+$/", $file)) {
-                        unlink(self::$_cache_path . $file);
-                    }
+            foreach (new \DirectoryIterator(self::$_cache_path) as $dir) {
+                if ($dir->isDot()) {
+                    continue;
                 }
-                closedir($handle);
+                static::unlinkCacheFile($idForm, $dir);
             }
         }
     }
     
+    /**
+     * Generate an expected cache file name for a form from his config file content 
+     * and template file content
+     * If any of those two files contents changes a new cache name will be generated
+     * indicating that content for that form has changed.
+     * @param string $idForm
+     * @param string $config_file
+     * @param string $template_file
+     * @return string
+     */
     public static function expectedCacheName($idForm, $config_file, $template_file)
     {
         return $idForm . "_" . md5(md5_file($config_file) . md5_file($template_file));
+    }
+    
+    /**
+     * Delete the cache file from filesystem
+     * @param string $idForm
+     * @param \DirectoryIterator $dir
+     */
+    private static function unlinkCacheFile($idForm, \DirectoryIterator $dir)
+    {
+        if (preg_match("/^" . $idForm . "_([0-9abcdef])+$/",  $dir->getFilename())) {
+            if(!unlink($dir->getRealPath()))
+            {
+                throw new FormGeneratorCacheException("Unable to delete cache file: " . $dir->getFilename());
+            }
+        }
     }
 }

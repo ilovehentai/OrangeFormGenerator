@@ -137,12 +137,13 @@ class FormGenerator extends FormGeneratorComposer implements FormGeneratorObserv
                                                             $this->formConfigLoader->getTemplateDirectoryPath()
                                                             . DIRECTORY_SEPARATOR . 
                                                             $this->templateFileName);
+        
         $cache_exist = FormGeneratorCache::checkCacheFile($cache_name);
         $html = "";
-
+        
         if($cache_exist === false || $this->debug === true)
         {
-
+            
             $html = $this->generateForm();
 
             FormGeneratorCache::clearFileCache($this->formId);
@@ -151,7 +152,9 @@ class FormGenerator extends FormGeneratorComposer implements FormGeneratorObserv
         }
         else
         {
+            ob_start();
             include FormGeneratorCache::$_cache_path . DIRECTORY_SEPARATOR . $cache_name;
+            $html = ob_get_clean();
         }
 
         return $html;
